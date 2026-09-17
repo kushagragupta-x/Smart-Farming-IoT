@@ -111,8 +111,8 @@
 
       .reveal {
         opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transform: translateY(18px);
+        transition: opacity 0.35s ease-out, transform 0.35s ease-out;
         will-change: opacity, transform;
       }
 
@@ -139,17 +139,17 @@
       }
 
       .hero-copy {
-        animation: heroEntrance 1s ease both;
+        animation: heroEntrance 0.55s ease both;
       }
 
       .hero-visual {
-        animation: heroEntrance 1.1s ease 0.2s both;
+        animation: heroEntrance 0.7s ease 0.08s both;
       }
 
       @keyframes heroEntrance {
         from {
           opacity: 0;
-          transform: translateY(24px);
+          transform: translateY(16px);
         }
         to {
           opacity: 1;
@@ -1129,7 +1129,7 @@
         right: 10%;
         top: 50%;
         height: 2px;
-        background: linear-gradient(90deg, transparent, rgba(104, 230, 255, 0.25), transparent);
+        background: linear-gradient(90deg, transparent, rgba(104, 230, 255, 0.12), transparent);
         transform: translateY(-50%);
       }
 
@@ -1150,51 +1150,77 @@
       .water-feed {
         position: absolute;
         left: 50%;
+        top: 18px;
+        bottom: 18px;
+        width: 80px;
         transform: translateX(-50%);
-        width: 100%;
-        top: 14px;
-        bottom: 14px;
         pointer-events: none;
-      }
-
-      .water-feed::before,
-      .water-feed::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 8px;
-        background: linear-gradient(180deg, rgba(102, 209, 255, 0.9), rgba(126, 240, 176, 0.42));
-        border-radius: 999px;
-        box-shadow: 0 0 12px rgba(104, 230, 255, 0.28);
+        overflow: visible;
       }
 
       .water-feed::before {
+        content: "";
+        position: absolute;
+        left: 50%;
         top: 0;
         bottom: 0;
-      }
-
-      .water-feed::after {
-        top: 18%;
-        bottom: 18%;
-        left: 40%;
         width: 6px;
-        opacity: 0.7;
+        transform: translateX(-50%);
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(104, 230, 255, 0), rgba(104, 230, 255, 0.78), rgba(126, 240, 176, 0.42));
+        box-shadow: 0 0 12px rgba(104, 230, 255, 0.22);
+        opacity: 0.8;
+        animation: waterPulse 2.8s ease-in-out infinite;
       }
 
       .water-feed .branch {
         position: absolute;
         left: 50%;
-        width: 20%;
-        height: 2px;
-        background: linear-gradient(90deg, rgba(104, 230, 255, 0.9), rgba(104, 230, 255, 0));
-        box-shadow: 0 0 12px rgba(104, 230, 255, 0.25);
+        width: 150px;
+        height: 3px;
+        border-radius: 999px;
         transform: translateX(-50%);
+        background: linear-gradient(90deg, rgba(104, 230, 255, 0), rgba(104, 230, 255, 0.85), rgba(104, 230, 255, 0));
+        box-shadow: 0 0 12px rgba(104, 230, 255, 0.18);
+        overflow: hidden;
+        opacity: 0.8;
+      }
+
+      .water-feed .branch::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+        transform: translateX(-100%);
+        animation: waterFlow 1.8s linear infinite;
       }
 
       .water-feed .branch:nth-child(1) { top: 23%; }
-      .water-feed .branch:nth-child(2) { top: 50%; }
-      .water-feed .branch:nth-child(3) { top: 77%; }
+      .water-feed .branch:nth-child(2) { top: 50%; animation-delay: 0.25s; }
+      .water-feed .branch:nth-child(3) { top: 77%; animation-delay: 0.5s; }
+
+      @keyframes waterPulse {
+        0%, 100% {
+          opacity: 0.45;
+          filter: blur(0.5px);
+        }
+        50% {
+          opacity: 0.9;
+          filter: blur(0);
+        }
+      }
+
+      @keyframes waterFlow {
+        0% {
+          transform: translateX(-120%);
+          opacity: 0;
+        }
+        15% { opacity: 1; }
+        100% {
+          transform: translateX(120%);
+          opacity: 0;
+        }
+      }
 
       .steps-grid {
         display: grid;
