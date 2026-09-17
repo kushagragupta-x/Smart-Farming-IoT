@@ -709,14 +709,17 @@
       .sensor-icon {
         width: 38px;
         height: 38px;
+        min-width: 38px;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
         background: rgba(71, 201, 151, 0.12);
         border: 1px solid rgba(126, 240, 176, 0.2);
         color: var(--green);
         font-size: 1.1rem;
+        line-height: 1;
         animation: iconPulse 2.6s ease-in-out infinite;
       }
 
@@ -806,6 +809,7 @@
         grid-template-columns: 1.1fr 0.9fr;
         gap: 26px;
         align-items: center;
+        position: relative;
       }
 
       .control-box {
@@ -813,6 +817,8 @@
         border: 1px solid rgba(110, 229, 255, 0.18);
         border-radius: 26px;
         padding: 24px;
+        position: relative;
+        z-index: 1;
       }
 
       .pump-status {
@@ -930,6 +936,8 @@
         background: linear-gradient(180deg, rgba(10, 22, 22, 0.9), rgba(8, 15, 18, 0.8));
         overflow: hidden;
         padding: 22px;
+        isolation: isolate;
+        z-index: 1;
       }
 
       .pipe-visual::before {
@@ -941,6 +949,7 @@
         border-radius: 999px;
         background: linear-gradient(180deg, rgba(74, 142, 255, 0.6), rgba(110, 255, 200, 0.6));
         box-shadow: 0 0 20px rgba(104, 230, 255, 0.38);
+        z-index: 1;
       }
 
       .pipe-visual::after {
@@ -948,8 +957,8 @@
         position: absolute;
         left: 50%;
         top: 14%;
-        width: 70%;
-        height: 70%;
+        width: 68%;
+        height: 68%;
         transform: translateX(-50%);
         background: linear-gradient(180deg, transparent, rgba(104, 230, 255, 0.08), transparent);
         border-left: 2px solid rgba(104, 230, 255, 0.3);
@@ -961,24 +970,31 @@
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        width: 64px;
-        height: 64px;
+        width: 58px;
+        height: 58px;
+        min-width: 58px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
         background: rgba(10, 25, 24, 0.92);
         border: 1px solid rgba(122, 255, 214, 0.3);
         box-shadow: inset 0 0 12px rgba(91, 202, 255, 0.16), 0 0 18px rgba(74, 142, 255, 0.14);
+        z-index: 3;
       }
 
       .pipe-node:first-child { top: 20px; }
-      .pipe-node:nth-child(2) { top: 32%; }
-      .pipe-node:nth-child(3) { top: 62%; }
+      .pipe-node:nth-child(2) { top: 30%; }
+      .pipe-node:nth-child(3) { top: 54%; }
       .pipe-node:nth-child(4) { bottom: 20px; }
 
       .pipe-node .icon {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         color: var(--green);
       }
 
@@ -986,6 +1002,7 @@
         position: absolute;
         inset: 0;
         pointer-events: none;
+        z-index: 2;
       }
 
       .water-drop {
@@ -997,6 +1014,7 @@
         background: rgba(105, 220, 255, 0.8);
         box-shadow: 0 0 12px rgba(105, 220, 255, 0.8);
         animation: drop 4s linear infinite;
+        z-index: 2;
       }
 
       .pipe-visual::before {
@@ -1068,9 +1086,15 @@
 
       .flow-step .icon {
         font-size: 1.5rem;
-        display: block;
-        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        margin: 0 auto 8px;
         color: var(--green);
+        line-height: 1;
+        flex-shrink: 0;
       }
 
       .farming-visual {
@@ -1319,9 +1343,15 @@
 
       .feature-card .icon {
         font-size: 1.8rem;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
         margin-bottom: 12px;
         color: var(--green);
+        line-height: 1;
+        flex-shrink: 0;
         transition: transform 0.28s ease, filter 0.28s ease;
       }
 
