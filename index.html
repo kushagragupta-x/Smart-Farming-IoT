@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IoT-BASED SMART IRRIGATION AND MULTI-LAYER FARMING SYSTEM</title>
+    <style>
+      :root {
+        --bg: #061712;
+        --bg-2: #0a1f1d;
+        --panel: rgba(17, 32, 29, 0.72);
+        --panel-strong: rgba(14, 28, 24, 0.9);
+        --line: rgba(122, 255, 214, 0.18);
+        --line-strong: rgba(120, 237, 255, 0.38);
+        --text: #e9fffb;
+        --muted: #9ecbc0;
+        --green: #7ef0b0;
+        --green-2: #42d391;
+        --cyan: #68e6ff;
+        --blue: #7ab8ff;
+        --glow: rgba(110, 255, 214, 0.45);
+        --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        --radius: 26px;
+      }
+
+      * { box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(72, 190, 180, 0.18), transparent 24%),
+          radial-gradient(circle at bottom right, rgba(70, 118, 255, 0.18), transparent 22%),
+          linear-gradient(135deg, var(--bg) 0%, #081a17 35%, #04130f 100%);
+        color: var(--text);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          repeating-linear-gradient(
+            to right,
+            rgba(120, 255, 214, 0.04) 0,
+            rgba(120, 255, 214, 0.04) 1px,
+            transparent 1px,
+            transparent 36px
+          ),
+          repeating-linear-gradient(
+            to bottom,
+            rgba(120, 255, 214, 0.04) 0,
+            rgba(120, 255, 214, 0.04) 1px,
+            transparent 1px,
+            transparent 36px
+          );
+        pointer-events: none;
+        opacity: 0.8;
+      }
+
+      .page-shell {
+        position: relative;
+        z-index: 1;
+      }
+
+      .container {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .section {
+        padding: 100px 0;
+        position: relative;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 42px;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--cyan);
+        font-size: 0.72rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        opacity: 0.92;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        margin: 0;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .futuristic-panel {
+        background: linear-gradient(180deg, rgba(15, 35, 31, 0.9), rgba(10, 21, 19, 0.82));
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+      }
+
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .particles {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: rgba(116, 255, 240, 0.9);
+        box-shadow: 0 0 12px rgba(111, 255, 227, 0.7);
+        animation: drift linear infinite;
+        opacity: 0.75;
+      }
+
+      @keyframes drift {
+        0% {
+          transform: translate3d(0, 0, 0) scale(0.7);
+          opacity: 0;
+        }
+        20% { opacity: 0.9; }
+        100% {
+          transform: translate3d(var(--x), var(--y), 0) scale(1.3);
+          opacity: 0;
+        }
+      }
+
+      .hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        padding: 24px 0 80px;
+      }
+
+      .hero::before,
+      .hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(40px);
+        pointer-events: none;
+      }
+
+      .hero::before {
+        width: 520px;
+        height: 520px;
+        right: -150px;
+        top: 80px;
+        background: rgba(37, 143, 255, 0.16);
+      }
+
+      .hero::after {
+        width: 520px;
+        height: 520px;
+        left: -180px;
+        bottom: 60px;
+        background: rgba(68, 255, 170, 0.12);
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.35fr 0.9fr;
+        gap: 28px;
+        align-items: center;
+      }
+
+      .hero-copy {
+        padding: 40px 0 20px;
+      }
+
+      .brand-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px;
+        border: 1px solid rgba(115, 255, 203, 0.26);
+        border-radius: 999px;
+        background: rgba(13, 30, 27, 0.75);
+        color: var(--green);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        font-weight: 700;
+        box-shadow: 0 0 20px rgba(80, 224, 160, 0.2);
+      }
+
+      .brand-tag .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 18px var(--green);
+        animation: pulse 1.8s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.5); opacity: 0.7; }
+      }
+
+      h1 {
+        font-size: clamp(2.4rem, 5vw, 5rem);
+        line-height: 1.07;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin: 22px 0 18px;
+        max-width: 760px;
+      }
+
+      h1 .accent {
+        color: var(--green);
+        text-shadow: 0 0 18px rgba(126, 240, 176, 0.38);
+      }
+
+      .team-line {
+        color: var(--muted);
+        font-size: clamp(0.8rem, 1.5vw, 1.05rem);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        margin-bottom: 26px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .team-line::before {
+        content: "";
+        width: 58px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--green));
+      }
+
+      .hero-cta {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+
+      .button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 24px;
+        border-radius: 14px;
+        border: 1px solid rgba(104, 230, 255, 0.3);
+        background: linear-gradient(135deg, rgba(17, 58, 55, 0.9), rgba(8, 26, 24, 0.9));
+        color: var(--text);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.72rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(56, 200, 175, 0.18);
+        border-color: rgba(126, 240, 176, 0.5);
+      }
+
+      .button.primary {
+        background: linear-gradient(135deg, rgba(29, 125, 99, 0.9), rgba(10, 52, 46, 0.95));
+        border-color: rgba(126, 240, 176, 0.4);
+      }
+
+      .hero-visual {
+        position: relative;
+        min-height: 620px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .dashboard-panel {
+        position: relative;
+        width: min(100%, 490px);
+        min-height: 560px;
+        border: 1px solid var(--line-strong);
+        background: linear-gradient(180deg, rgba(8, 28, 26, 0.82), rgba(9, 18, 16, 0.9));
+        border-radius: 30px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255,255,255,0.02);
+        padding: 22px 18px 18px;
+        overflow: hidden;
+        animation: floatCard 6s ease-in-out infinite;
+      }
+
+      @keyframes floatCard {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-12px); }
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+
+      .signal {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .signal span {
+        display: block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: rgba(126, 240, 176, 0.7);
+        box-shadow: 0 0 12px rgba(126, 240, 176, 0.5);
+      }
+
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(14, 48, 42, 0.8);
+        border: 1px solid rgba(126, 240, 176, 0.15);
+        color: var(--green);
+        font-size: 0.7rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .status-chip .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 14px rgba(126, 240, 176, 0.75);
+      }
+
+      .control-board {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .mini-card {
+        background: rgba(11, 23, 21, 0.9);
+        border: 1px solid rgba(111, 196, 255, 0.18);
+        border-radius: 18px;
+        padding: 16px 14px;
+      }
+
+      .mini-card h4 {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin: 8px 0;
+      }
+
+      .metric strong {
+        font-size: 1.35rem;
+        color: var(--text);
+      }
+
+      .metric span {
+        color: var(--green);
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+
+      .ring-wrapper {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .circular-meter {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(8, 20, 18, 0.95);
+        border: 1px solid rgba(122, 255, 214, 0.16);
+        border-radius: 22px;
+        padding: 14px 10px 12px;
+      }
+
+      .circular-meter svg {
+        width: 96px;
+        height: 96px;
+        transform: rotate(-90deg);
+      }
+
+      .circular-meter circle {
+        fill: none;
+        stroke-width: 10;
+      }
+
+      .circular-meter .bg {
+        stroke: rgba(121, 160, 151, 0.12);
+      }
+
+      .circular-meter .progress {
+        stroke: url(#meterGradient);
+        stroke-linecap: round;
+        stroke-dasharray: 251.2;
+        stroke-dashoffset: 251.2;
+        transition: stroke-dashoffset 1.2s ease;
+      }
+
+      .meter-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--text);
+      }
+
+      .meter-wrap {
+        position: relative;
+        width: 96px;
+        height: 96px;
+      }
+
+      .meter-info {
+        margin-top: 8px;
+        text-align: center;
+      }
+
+      .meter-info small {
+        color: var(--muted);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 0.58rem;
+      }
+
+      .meter-info strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 1.2rem;
+      }
+
+      .farm-display {
+        margin-top: 18px;
+        border: 1px solid var(--line);
+        background: rgba(8, 15, 19, 0.8);
+        border-radius: 20px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .farm-display .leaf {
+        color: var(--green);
+        font-size: 1.35rem;
+      }
+
+      .farm-display .text-block {
+        flex: 1;
+        margin-left: 12px;
+      }
+
+      .farm-display small {
+        display: block;
+        color: var(--muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .farm-display strong {
+        font-size: 1.3rem;
+      }
+
+      .data-stream {
+        position: relative;
+        height: 90px;
+        border-radius: 20px;
+        margin-top: 18px;
+        background: rgba(9, 18, 16, 0.9);
+        border: 1px solid rgba(104, 230, 255, 0.12);
+        overflow: hidden;
+      }
+
+      .data-stream::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(104, 230, 255, 0.08), transparent);
+        animation: sweep 4s linear infinite;
+      }
+
+      @keyframes sweep {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+
+      .chart-line {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: 20px;
+        height: 54px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(85, 185, 255, 0), rgba(85, 185, 255, 0.15));
+        clip-path: polygon(0% 70%, 12% 68%, 26% 61%, 38% 66%, 54% 45%, 68% 54%, 82% 42%, 100% 36%, 100% 100%, 0% 100%);
+        opacity: 0.62;
+      }
+
+      .chart-line::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(104, 230, 255, 0.4), rgba(126, 240, 176, 0.3), transparent);
+        animation: lineGlow 3.8s ease infinite alternate;
+      }
+
+      @keyframes lineGlow {
+        0% { transform: translateX(-18%); opacity: 0.6; }
+        100% { transform: translateX(18%); opacity: 1; }
+      }
+
+      .live-metric-grid {
+        margin-top: 26px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+      }
+
+      .sensor-card {
+        background: linear-gradient(180deg, rgba(18, 37, 34, 0.88), rgba(8, 16, 17, 0.9));
+        border: 1px solid rgba(109, 239, 194, 0.16);
+        border-radius: 26px;
+        padding: 22px 18px 18px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      }
+
+      .sensor-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .sensor-card h3 {
+        margin: 0;
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .sensor-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(71, 201, 151, 0.12);
+        border: 1px solid rgba(126, 240, 176, 0.2);
+        color: var(--green);
+        font-size: 1.1rem;
+      }
+
+      .gauge-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 14px auto 16px;
+      }
+
+      .gauge {
+        position: relative;
+        width: 150px;
+        height: 150px;
+      }
+
+      .gauge svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      .gauge circle {
+        fill: none;
+        stroke-width: 10;
+      }
+
+      .gauge .bg {
+        stroke: rgba(160, 191, 181, 0.16);
+      }
+
+      .gauge .progress {
+        stroke: var(--gauge-color, var(--green));
+        stroke-linecap: round;
+        stroke-dasharray: 439.8;
+        stroke-dashoffset: 439.8;
+        transition: stroke-dashoffset 1.2s ease;
+        filter: drop-shadow(0 0 12px rgba(126, 240, 176, 0.45));
+      }
+
+      .gauge-value {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .gauge-value strong {
+        font-size: clamp(1.75rem, 3vw, 2.3rem);
+        line-height: 1;
+      }
+
+      .gauge-value span {
+        margin-top: 8px;
+        color: var(--muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 0.62rem;
+      }
+
+      .meter-scale {
+        display: flex;
+        justify-content: space-between;
+        color: rgba(232, 255, 249, 0.42);
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 10px;
+      }
+
+      .smart-irrigation {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 26px;
+        align-items: center;
+      }
+
+      .control-box {
+        background: linear-gradient(180deg, rgba(15, 25, 23, 0.88), rgba(10, 18, 18, 0.8));
+        border: 1px solid rgba(110, 229, 255, 0.18);
+        border-radius: 26px;
+        padding: 24px;
+      }
+
+      .pump-status {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      .pump-box {
+        padding: 18px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(125, 225, 254, 0.12);
+        background: rgba(9, 17, 17, 0.9);
+      }
+
+      .pump-box small {
+        display: block;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-size: 0.6rem;
+      }
+
+      .pump-box strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 2rem;
+        color: var(--text);
+      }
+
+      .pump-box strong.off {
+        color: #ff8d90;
+      }
+
+      .pump-box strong.on {
+        color: var(--green);
+      }
+
+      .toggle-group {
+        display: flex;
+        gap: 12px;
+        overflow: hidden;
+        margin: 18px 0 24px;
+      }
+
+      .mode-btn, .action-btn {
+        flex: 1;
+        min-height: 52px;
+        border-radius: 14px;
+        border: 1px solid rgba(111, 230, 255, 0.16);
+        background: rgba(13, 25, 26, 0.9);
+        color: var(--text);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.72rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      }
+
+      .mode-btn.active {
+        background: linear-gradient(135deg, rgba(42, 150, 120, 0.9), rgba(17, 56, 48, 0.9));
+        border-color: rgba(126, 240, 176, 0.45);
+        box-shadow: 0 18px 25px rgba(30, 160, 115, 0.16);
+      }
+
+      .action-btn.primary {
+        background: linear-gradient(135deg, rgba(32, 126, 104, 0.9), rgba(15, 66, 57, 0.9));
+      }
+
+      .action-btn.danger {
+        background: linear-gradient(135deg, rgba(71, 46, 58, 0.85), rgba(40, 24, 25, 0.9));
+      }
+
+      .action-btn:active, .mode-btn:active {
+        transform: scale(0.98);
+      }
+
+      .pipe-visual {
+        position: relative;
+        min-height: 320px;
+        border-radius: 26px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(10, 22, 22, 0.9), rgba(8, 15, 18, 0.8));
+        overflow: hidden;
+        padding: 22px;
+      }
+
+      .pipe-visual::before {
+        content: "";
+        position: absolute;
+        inset: 18px auto 18px 50%;
+        width: 12px;
+        transform: translateX(-50%);
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(74, 142, 255, 0.6), rgba(110, 255, 200, 0.6));
+        box-shadow: 0 0 20px rgba(104, 230, 255, 0.38);
+      }
+
+      .pipe-visual::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 14%;
+        width: 70%;
+        height: 70%;
+        transform: translateX(-50%);
+        background: linear-gradient(180deg, transparent, rgba(104, 230, 255, 0.08), transparent);
+        border-left: 2px solid rgba(104, 230, 255, 0.3);
+        border-right: 2px solid rgba(104, 230, 255, 0.3);
+        border-radius: 50%;
+      }
+
+      .pipe-node {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(10, 25, 24, 0.92);
+        border: 1px solid rgba(122, 255, 214, 0.3);
+        box-shadow: inset 0 0 12px rgba(91, 202, 255, 0.16), 0 0 18px rgba(74, 142, 255, 0.14);
+      }
+
+      .pipe-node:first-child { top: 20px; }
+      .pipe-node:nth-child(2) { top: 32%; }
+      .pipe-node:nth-child(3) { top: 62%; }
+      .pipe-node:nth-child(4) { bottom: 20px; }
+
+      .pipe-node .icon {
+        font-size: 1.3rem;
+        color: var(--green);
+      }
+
+      .water-flow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .water-drop {
+        position: absolute;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(105, 220, 255, 0.8);
+        box-shadow: 0 0 12px rgba(105, 220, 255, 0.8);
+        animation: drop 4s linear infinite;
+      }
+
+      .water-drop:nth-child(1) { top: 10%; animation-delay: 0s; }
+      .water-drop:nth-child(2) { top: 20%; animation-delay: 1s; }
+      .water-drop:nth-child(3) { top: 36%; animation-delay: 2s; }
+      .water-drop:nth-child(4) { top: 54%; animation-delay: 3s; }
+      .water-drop:nth-child(5) { top: 72%; animation-delay: 0.5s; }
+
+      @keyframes drop {
+        0% { transform: translate(-50%, -16px) scale(0.7); opacity: 0; }
+        20% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { transform: translate(-50%, 240px) scale(1.1); opacity: 0; }
+      }
+
+      .flow-diagram {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        align-items: center;
+      }
+
+      .flow-step {
+        position: relative;
+        padding: 18px 14px;
+        text-align: center;
+        background: rgba(9, 17, 18, 0.8);
+        border: 1px solid rgba(130, 228, 255, 0.16);
+        border-radius: 18px;
+        z-index: 1;
+      }
+
+      .flow-step::after {
+        content: "";
+        position: absolute;
+        right: -18px;
+        top: 50%;
+        width: 18px;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(103, 230, 255, 0.7), transparent);
+        transform: translateY(-50%);
+      }
+
+      .flow-step:last-child::after { display: none; }
+
+      .flow-step strong {
+        display: block;
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        line-height: 1.5;
+      }
+
+      .flow-step .icon {
+        font-size: 1.5rem;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--green);
+      }
+
+      .farming-visual {
+        display: flex;
+        justify-content: center;
+      }
+
+      .farm-stack {
+        position: relative;
+        width: min(100%, 720px);
+        padding: 24px 10px 30px;
+        border-radius: 30px;
+        border: 1px solid rgba(120, 239, 255, 0.18);
+        background: linear-gradient(180deg, rgba(10, 22, 23, 0.9), rgba(8, 16, 17, 0.8));
+      }
+
+      .layer {
+        position: relative;
+        width: 82%;
+        height: 88px;
+        margin: 16px auto;
+        border-radius: 20px;
+        border: 1px solid rgba(126, 240, 176, 0.2);
+        background: linear-gradient(180deg, rgba(16, 38, 35, 0.86), rgba(9, 22, 21, 0.92));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        box-shadow: inset 0 0 18px rgba(122, 255, 214, 0.05), 0 18px 45px rgba(21, 70, 56, 0.18);
+      }
+
+      .layer:nth-child(1) { width: 88%; }
+      .layer:nth-child(2) { width: 72%; }
+      .layer:nth-child(3) { width: 58%; }
+
+      .layer::before {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        top: 50%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(104, 230, 255, 0.25), transparent);
+        transform: translateY(-50%);
+      }
+
+      .layer .leaf {
+        font-size: 1.5rem;
+        color: var(--green);
+        filter: drop-shadow(0 0 15px rgba(126, 240, 176, 0.3));
+      }
+
+      .layer span {
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .water-feed {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        top: 14px;
+        bottom: 14px;
+        pointer-events: none;
+      }
+
+      .water-feed::before,
+      .water-feed::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 8px;
+        background: linear-gradient(180deg, rgba(102, 209, 255, 0.9), rgba(126, 240, 176, 0.42));
+        border-radius: 999px;
+        box-shadow: 0 0 12px rgba(104, 230, 255, 0.28);
+      }
+
+      .water-feed::before {
+        top: 0;
+        bottom: 0;
+      }
+
+      .water-feed::after {
+        top: 18%;
+        bottom: 18%;
+        left: 40%;
+        width: 6px;
+        opacity: 0.7;
+      }
+
+      .water-feed .branch {
+        position: absolute;
+        left: 50%;
+        width: 20%;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(104, 230, 255, 0.9), rgba(104, 230, 255, 0));
+        box-shadow: 0 0 12px rgba(104, 230, 255, 0.25);
+        transform: translateX(-50%);
+      }
+
+      .water-feed .branch:nth-child(1) { top: 23%; }
+      .water-feed .branch:nth-child(2) { top: 50%; }
+      .water-feed .branch:nth-child(3) { top: 77%; }
+
+      .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .step-card {
+        position: relative;
+        background: linear-gradient(180deg, rgba(14, 31, 25, 0.88), rgba(8, 15, 18, 0.88));
+        border: 1px solid rgba(120, 239, 255, 0.15);
+        border-radius: 22px;
+        padding: 22px 18px 18px;
+      }
+
+      .step-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 18px;
+        right: 18px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(122, 255, 214, 0.26), transparent);
+      }
+
+      .step-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(73, 207, 164, 0.22), rgba(86, 123, 255, 0.18));
+        border: 1px solid rgba(122, 255, 214, 0.22);
+        color: var(--green);
+        font-weight: 800;
+        margin-bottom: 14px;
+      }
+
+      .step-card h4 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+        letter-spacing: 0.04em;
+      }
+
+      .step-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.96rem;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .feature-card {
+        position: relative;
+        background: linear-gradient(180deg, rgba(14, 31, 29, 0.88), rgba(8, 16, 17, 0.88));
+        border: 1px solid rgba(120, 239, 255, 0.12);
+        border-radius: 22px;
+        padding: 20px 18px;
+        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+        overflow: hidden;
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(126, 240, 176, 0.4), rgba(104, 230, 255, 0.8), rgba(126, 240, 176, 0.4));
+        opacity: 0.7;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(122, 255, 214, 0.32);
+        box-shadow: 0 18px 35px rgba(0, 0, 0, 0.2), 0 0 24px rgba(79, 219, 186, 0.08);
+      }
+
+      .feature-card .icon {
+        font-size: 1.8rem;
+        display: inline-block;
+        margin-bottom: 12px;
+        color: var(--green);
+      }
+
+      .feature-card h4 {
+        margin: 0 0 8px;
+        font-size: 1.02rem;
+        letter-spacing: 0.04em;
+      }
+
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+      }
+
+      .member-card {
+        padding: 20px 18px;
+        background: linear-gradient(180deg, rgba(20, 39, 36, 0.88), rgba(9, 17, 17, 0.9));
+        border: 1px solid rgba(120, 239, 255, 0.12);
+        border-radius: 22px;
+        text-align: center;
+        transition: transform 0.25s ease, border-color 0.25s ease;
+      }
+
+      .member-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(122, 255, 214, 0.32);
+      }
+
+      .member-card.leader {
+        border-color: rgba(126, 240, 176, 0.36);
+        box-shadow: 0 0 0 1px rgba(126, 240, 176, 0.12), 0 18px 32px rgba(23, 175, 123, 0.12);
+      }
+
+      .member-avatar {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        margin: 0 auto 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(40, 138, 112, 0.8), rgba(42, 84, 168, 0.7));
+        border: 1px solid rgba(126, 240, 176, 0.24);
+        color: var(--text);
+        font-weight: 800;
+        font-size: 1.1rem;
+      }
+
+      .member-card h4 {
+        margin: 0 0 6px;
+        font-size: 1.05rem;
+      }
+
+      .member-card p {
+        margin: 0;
+        color: var(--green);
+        font-size: 0.72rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .about-box,
+      .why-box {
+        position: relative;
+        padding: 34px 28px;
+        background: linear-gradient(180deg, rgba(16, 28, 26, 0.92), rgba(9, 20, 19, 0.8));
+        border: 1px solid rgba(126, 240, 176, 0.14);
+        border-radius: 30px;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+      }
+
+      .about-box::before,
+      .why-box::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(104, 230, 255, 0.12), transparent 30%);
+        pointer-events: none;
+      }
+
+      .about-box p,
+      .why-box p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.02rem;
+      }
+
+      footer {
+        padding: 32px 0 52px;
+        text-align: center;
+      }
+
+      .footer-box {
+        display: inline-block;
+        padding: 24px 26px;
+        border-radius: 18px;
+        border: 1px solid rgba(120, 239, 255, 0.14);
+        background: rgba(10, 18, 18, 0.7);
+        box-shadow: 0 0 26px rgba(91, 202, 255, 0.08);
+        animation: footerFade 2.4s ease both;
+      }
+
+      @keyframes footerFade {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .footer-box .brand {
+        font-size: clamp(1rem, 2vw, 1.4rem);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+
+      .footer-box .meta {
+        margin-top: 10px;
+        color: var(--muted);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid,
+        .smart-irrigation {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-visual {
+          min-height: 420px;
+        }
+
+        .team-grid,
+        .feature-grid,
+        .steps-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 700px) {
+        .section { padding: 72px 0; }
+
+        .live-metric-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .pump-status {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .flow-diagram {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .flow-step::after {
+          display: none;
+        }
+
+        .team-grid,
+        .feature-grid,
+        .steps-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .brand-tag,
+        .team-line {
+          letter-spacing: 0.11em;
+        }
+
+        h1 {
+          letter-spacing: 0.02em;
+        }
+
+        .toggle-group {
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .container {
+          width: min(100% - 22px, 1180px);
+        }
+
+        .dashboard-panel {
+          padding: 16px 12px;
+        }
+
+        .control-board {
+          grid-template-columns: 1fr;
+        }
+
+        .ring-wrapper {
+          grid-template-columns: 1fr;
+        }
+
+        .farm-stack {
+          padding-top: 18px;
+        }
+
+        .layer {
+          height: 72px;
+          width: 90%;
+        }
+
+        .layer:nth-child(1) { width: 96%; }
+        .layer:nth-child(2) { width: 82%; }
+        .layer:nth-child(3) { width: 68%; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="particles" id="particles" aria-hidden="true"></div>
+
+    <div class="page-shell">
+      <header class="hero">
+        <div class="container hero-grid">
+          <div class="hero-copy reveal">
+            <div class="brand-tag"><span class="dot"></span> SYSTEM READY</div>
+            <h1>
+              IoT-BASED SMART IRRIGATION<br />
+              <span class="accent">AND MULTI-LAYER FARMING SYSTEM</span>
+            </h1>
+            <div class="team-line">TEAM PROTOTYPE • IX-F</div>
+            <div class="hero-cta">
+              <button class="button primary" type="button">Live System</button>
+              <button class="button" type="button">Monitoring</button>
+            </div>
+          </div>
+
+          <div class="hero-visual reveal">
+            <div class="dashboard-panel futuristic-panel">
+              <div class="dashboard-header">
+                <div class="signal" aria-label="system signal">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <div class="status-chip"><span class="dot"></span> SYSTEM READY</div>
+              </div>
+
+              <div class="control-board">
+                <div class="mini-card">
+                  <h4>Water Flow</h4>
+                  <div class="metric"><strong>68%</strong><span>FLOW</span></div>
+                </div>
+                <div class="mini-card">
+                  <h4>Farm Mode</h4>
+                  <div class="metric"><strong>AUTO</strong><span>MODE</span></div>
+                </div>
+              </div>
+
+              <div class="ring-wrapper">
+                <div class="circular-meter">
+                  <div class="meter-wrap">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                      <defs>
+                        <linearGradient id="meterGradient" x1="0%" x2="100%" y1="0%" y2="0%">
+                          <stop offset="0%" stop-color="#81f2be" />
+                          <stop offset="55%" stop-color="#66e3ff" />
+                          <stop offset="100%" stop-color="#7cb7ff" />
+                        </linearGradient>
+                      </defs>
+                      <circle class="bg" cx="50" cy="50" r="40"></circle>
+                      <circle class="progress" cx="50" cy="50" r="40" data-progress="72"></circle>
+                    </svg>
+                    <div class="meter-text">72%</div>
+                  </div>
+                  <div class="meter-info">
+                    <small>Moisture</small>
+                    <strong>72%</strong>
+                  </div>
+                </div>
+
+                <div class="circular-meter">
+                  <div class="meter-wrap">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                      <defs>
+                        <linearGradient id="meterGradient2" x1="0%" x2="100%" y1="0%" y2="0%">
+                          <stop offset="0%" stop-color="#8df0ff" />
+                          <stop offset="100%" stop-color="#5fe4bf" />
+                        </linearGradient>
+                      </defs>
+                      <circle class="bg" cx="50" cy="50" r="40"></circle>
+                      <circle class="progress" cx="50" cy="50" r="40" data-progress="64" style="stroke: url(#meterGradient2);"></circle>
+                    </svg>
+                    <div class="meter-text">64%</div>
+                  </div>
+                  <div class="meter-info">
+                    <small>Humidity</small>
+                    <strong>64%</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="farm-display">
+                <div class="leaf">🌱</div>
+                <div class="text-block">
+                  <small>Layered Farm</small>
+                  <strong>3 Layers Active</strong>
+                </div>
+                <div class="leaf">💧</div>
+              </div>
+
+              <div class="data-stream">
+                <div class="chart-line"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Dashboard Overview</div>
+              <h2>Live Farm Monitoring</h2>
+            </div>
+
+            <div class="live-metric-grid reveal">
+              <article class="sensor-card">
+                <div class="sensor-card-header">
+                  <h3>Temperature</h3>
+                  <div class="sensor-icon">🌡️</div>
+                </div>
+                <div class="gauge-wrap">
+                  <div class="gauge">
+                    <svg viewBox="0 0 160 160" aria-hidden="true">
+                      <circle class="bg" cx="80" cy="80" r="70"></circle>
+                      <circle class="progress" cx="80" cy="80" r="70" data-progress="72" style="--gauge-color:#7ef0b0;"></circle>
+                    </svg>
+                    <div class="gauge-value">
+                      <strong>28</strong>
+                      <span>°C</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="meter-scale">
+                  <span>0°</span>
+                  <span>100°</span>
+                </div>
+              </article>
+
+              <article class="sensor-card">
+                <div class="sensor-card-header">
+                  <h3>Humidity</h3>
+                  <div class="sensor-icon">💧</div>
+                </div>
+                <div class="gauge-wrap">
+                  <div class="gauge">
+                    <svg viewBox="0 0 160 160" aria-hidden="true">
+                      <circle class="bg" cx="80" cy="80" r="70"></circle>
+                      <circle class="progress" cx="80" cy="80" r="70" data-progress="64" style="--gauge-color:#68e6ff;"></circle>
+                    </svg>
+                    <div class="gauge-value">
+                      <strong>64</strong>
+                      <span>%</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="meter-scale">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
+              </article>
+
+              <article class="sensor-card">
+                <div class="sensor-card-header">
+                  <h3>Soil Moisture</h3>
+                  <div class="sensor-icon">🌱</div>
+                </div>
+                <div class="gauge-wrap">
+                  <div class="gauge">
+                    <svg viewBox="0 0 160 160" aria-hidden="true">
+                      <circle class="bg" cx="80" cy="80" r="70"></circle>
+                      <circle class="progress" cx="80" cy="80" r="70" data-progress="72" style="--gauge-color:#7ef0b0;"></circle>
+                    </svg>
+                    <div class="gauge-value">
+                      <strong>72</strong>
+                      <span>%</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="meter-scale">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Automation</div>
+              <h2>Smart Irrigation</h2>
+            </div>
+
+            <div class="smart-irrigation reveal">
+              <div class="control-box">
+                <div class="pump-status">
+                  <div class="pump-box">
+                    <small>Water Pump</small>
+                    <strong class="off">OFF</strong>
+                  </div>
+                  <div class="pump-box">
+                    <small>Mode</small>
+                    <strong>AUTO</strong>
+                  </div>
+                </div>
+
+                <div class="toggle-group">
+                  <button class="mode-btn active" type="button">AUTO</button>
+                  <button class="mode-btn" type="button">MANUAL</button>
+                </div>
+
+                <div class="toggle-group">
+                  <button class="action-btn primary" type="button">PUMP ON</button>
+                  <button class="action-btn danger" type="button">PUMP OFF</button>
+                </div>
+
+                <p style="margin: 18px 0 0; color: var(--muted); font-size: 0.98rem; line-height: 1.8;">
+                  The system monitors soil moisture and manages irrigation according to the water requirements of the crops.
+                </p>
+              </div>
+
+              <div class="pipe-visual futuristic-panel">
+                <div class="pipe-node"><span class="icon">🌧️</span></div>
+                <div class="pipe-node"><span class="icon">💧</span></div>
+                <div class="pipe-node"><span class="icon">📡</span></div>
+                <div class="pipe-node"><span class="icon">🌱</span></div>
+
+                <div class="water-flow" aria-hidden="true">
+                  <span class="water-drop"></span>
+                  <span class="water-drop"></span>
+                  <span class="water-drop"></span>
+                  <span class="water-drop"></span>
+                  <span class="water-drop"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Water System</div>
+              <h2>Water Management</h2>
+            </div>
+
+            <div class="flow-diagram reveal">
+              <div class="flow-step">
+                <span class="icon">🌧️</span>
+                <strong>Rainwater<br />Harvesting</strong>
+              </div>
+              <div class="flow-step">
+                <span class="icon">🛢️</span>
+                <strong>Water<br />Storage</strong>
+              </div>
+              <div class="flow-step">
+                <span class="icon">📡</span>
+                <strong>ESP32<br />Monitoring</strong>
+              </div>
+              <div class="flow-step">
+                <span class="icon">🚰</span>
+                <strong>Smart<br />Irrigation</strong>
+              </div>
+              <div class="flow-step">
+                <span class="icon">🌿</span>
+                <strong>Multi-Layer<br />Farm</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Cultivation Design</div>
+              <h2>Multi-Layer Farming</h2>
+            </div>
+
+            <div class="farming-visual reveal">
+              <div class="farm-stack futuristic-panel">
+                <div class="water-feed" aria-hidden="true">
+                  <span class="branch"></span>
+                  <span class="branch"></span>
+                  <span class="branch"></span>
+                </div>
+
+                <div class="layer">
+                  <span class="leaf">🌱</span>
+                  <span>LAYER 3</span>
+                </div>
+                <div class="layer">
+                  <span class="leaf">🌱</span>
+                  <span>LAYER 2</span>
+                </div>
+                <div class="layer">
+                  <span class="leaf">🌱</span>
+                  <span>LAYER 1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Process Flow</div>
+              <h2>How The System Works</h2>
+            </div>
+
+            <div class="steps-grid reveal">
+              <article class="step-card">
+                <div class="step-number">1</div>
+                <h4>Soil monitoring</h4>
+                <p>The soil moisture sensor monitors the moisture level of the soil.</p>
+              </article>
+
+              <article class="step-card">
+                <div class="step-number">2</div>
+                <h4>Climate reading</h4>
+                <p>The DHT11 sensor measures temperature and humidity.</p>
+              </article>
+
+              <article class="step-card">
+                <div class="step-number">3</div>
+                <h4>Processing unit</h4>
+                <p>The ESP32 acts as the main microcontroller and processes the sensor data.</p>
+              </article>
+
+              <article class="step-card">
+                <div class="step-number">4</div>
+                <h4>Water delivery</h4>
+                <p>Based on soil moisture, the irrigation system can control the water pump.</p>
+              </article>
+
+              <article class="step-card">
+                <div class="step-number">5</div>
+                <h4>Reuse water</h4>
+                <p>Rainwater can be collected and reused for irrigation.</p>
+              </article>
+
+              <article class="step-card">
+                <div class="step-number">6</div>
+                <h4>Vertical planting</h4>
+                <p>The multi-layer farming structure makes better use of available space.</p>
+              </article>
+
+              <article class="step-card" style="grid-column: span 3;">
+                <div class="step-number">7</div>
+                <h4>Remote dashboard</h4>
+                <p>The ESP32 can communicate with a remote dashboard through Wi-Fi and Blynk.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Core Capabilities</div>
+              <h2>System Features</h2>
+            </div>
+
+            <div class="feature-grid reveal">
+              <article class="feature-card">
+                <div class="icon">🌱</div>
+                <h4>Soil Moisture Monitoring</h4>
+              </article>
+              <article class="feature-card">
+                <div class="icon">🌡️</div>
+                <h4>Temperature Monitoring</h4>
+              </article>
+              <article class="feature-card">
+                <div class="icon">💧</div>
+                <h4>Humidity Monitoring</h4>
+              </article>
+              <article class="feature-card">
+                <div class="icon">🚰</div>
+                <h4>Smart Irrigation</h4>
+              </article>
+              <article class="feature-card">
+                <div class="icon">🌧️</div>
+                <h4>Rainwater Harvesting</h4>
+              </article>
+              <article class="feature-card">
+                <div class="icon">🏢</div>
+                <h4>Multi-Layer Farming</h4>
+              </article>
+              <article class="feature-card">
+                <div class="icon">📡</div>
+                <h4>ESP32 IoT Connectivity</h4>
+              </article>
+              <article class="feature-card">
+                <div class="icon">📱</div>
+                <h4>Remote Monitoring</h4>
+              </article>
+              <article class="feature-card">
+                <div class="icon">⚙️</div>
+                <h4>Automatic / Manual Pump Control</h4>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Project Team</div>
+              <h2>Our Team</h2>
+            </div>
+
+            <div class="team-grid reveal">
+              <article class="member-card leader">
+                <div class="member-avatar">KG</div>
+                <h4>Kushagra Gupta</h4>
+                <p>TEAM LEADER</p>
+              </article>
+
+              <article class="member-card">
+                <div class="member-avatar">A</div>
+                <h4>Ansh</h4>
+                <p></p>
+              </article>
+
+              <article class="member-card">
+                <div class="member-avatar">PP</div>
+                <h4>Pratap Prajapati</h4>
+                <p></p>
+              </article>
+
+              <article class="member-card">
+                <div class="member-avatar">AK</div>
+                <h4>Atul Kumar</h4>
+                <p></p>
+              </article>
+
+              <article class="member-card">
+                <div class="member-avatar">KR</div>
+                <h4>Kushagra Ranjan Pathak</h4>
+                <p></p>
+              </article>
+
+              <article class="member-card">
+                <div class="member-avatar">ST</div>
+                <h4>Shambhavi Tripathi</h4>
+                <p></p>
+              </article>
+
+              <article class="member-card">
+                <div class="member-avatar">AY</div>
+                <h4>Ananya Yadav</h4>
+                <p></p>
+              </article>
+
+              <article class="member-card">
+                <div class="member-avatar">SS</div>
+                <h4>Salvi Shukla</h4>
+                <p></p>
+              </article>
+
+              <article class="member-card">
+                <div class="member-avatar">YS</div>
+                <h4>Yatharth Singh</h4>
+                <p></p>
+              </article>
+
+              <article class="member-card" style="grid-column: 2 / span 1;">
+                <div class="member-avatar">VP</div>
+                <h4>Veer Pratap Singh</h4>
+                <p></p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Project Overview</div>
+              <h2>About The Project</h2>
+            </div>
+
+            <div class="about-box reveal">
+              <p>
+                "Our project is an IoT-Based Smart Irrigation and Multi-Layer Farming System designed to reduce water wastage and improve the efficiency of farming. The system uses an ESP32 microcontroller along with soil moisture, temperature and humidity sensors to monitor farming conditions. Rainwater can be collected and reused for irrigation, while the smart irrigation system can control water supply according to soil moisture requirements. The multi-layer farming structure helps make better use of available space."
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Purpose</div>
+              <h2>Why We Built This</h2>
+            </div>
+
+            <div class="why-box reveal">
+              <p>
+                "We wanted to combine electronics, programming, IoT and sustainable farming into one practical system. Instead of simply monitoring the farm, our project focuses on using sensor data to make irrigation more efficient and reduce unnecessary water usage."
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="container">
+          <div class="footer-box reveal">
+            <div class="brand">Made with ⚡ by Kushagra Gupta</div>
+            <div class="meta">Team Prototype • IX-F • IoT • Smart Farming • ESP32</div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        if (!particlesContainer) return;
+
+        const count = 32;
+        for (let i = 0; i < count; i++) {
+          const particle = document.createElement('span');
+          particle.className = 'particle';
+
+          const size = Math.random() * 5 + 3;
+          const x = (Math.random() * 140 - 20).toFixed(2);
+          const y = (Math.random() * 120 - 20).toFixed(2);
+          const duration = (Math.random() * 10 + 10).toFixed(2);
+          const delay = (Math.random() * 8).toFixed(2);
+          const left = (Math.random() * 100).toFixed(2);
+          const top = (Math.random() * 100).toFixed(2);
+
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.left = `${left}%`;
+          particle.style.top = `${top}%`;
+          particle.style.animationDuration = `${duration}s`;
+          particle.style.animationDelay = `${delay}s`;
+          particle.style.setProperty('--x', `${x}px`);
+          particle.style.setProperty('--y', `${y}px`);
+
+          particlesContainer.appendChild(particle);
+        }
+      }
+
+      function initGauges() {
+        const rings = document.querySelectorAll('.progress[data-progress]');
+        rings.forEach((ring) => {
+          const progress = Number(ring.dataset.progress || 0);
+          const radius = Number(ring.getAttribute('r')) || 70;
+          const circumference = 2 * Math.PI * radius;
+          const offset = circumference - (progress / 100) * circumference;
+          ring.style.strokeDasharray = `${circumference}`;
+          ring.style.strokeDashoffset = `${circumference}`;
+          requestAnimationFrame(() => {
+            ring.style.strokeDashoffset = `${offset}`;
+          });
+        });
+      }
+
+      function initReveal() {
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+
+        reveals.forEach((el) => observer.observe(el));
+      }
+
+      createParticles();
+      initGauges();
+      initReveal();
+    </script>
+  </body>
+</html>
