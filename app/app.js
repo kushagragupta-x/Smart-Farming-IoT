@@ -20,6 +20,9 @@ const systemState = {
 const elements = {
   connectionLabel: document.querySelector("[data-connection-label]"),
   connectionBadge: document.querySelector("[data-connection-badge]"),
+  heroStatus: document.querySelector(".hero-status"),
+  heroStatusText: document.querySelector("[data-esp32-status-text]"),
+  heroStatusMeta: document.querySelector("[data-esp32-status-meta]"),
   commandMessage: document.querySelector("[data-command-message]"),
   pumpButton: document.querySelector("[data-pump-command]"),
   pumpState: document.querySelector("[data-pump-state]"),
@@ -46,42 +49,110 @@ function renderSystemState() {
   setText("[data-status=temperature]", systemState.temperature === null ? "DATA UNAVAILABLE" : "SENSOR OK");
   setText("[data-status=humidity]", systemState.humidity === null ? "DATA UNAVAILABLE" : "SENSOR OK");
 
+  const esp32Label = systemState.esp32Online ? "ONLINE" : "OFFLINE";
+  const wifiLabel = systemState.wifiConnected ? "CONNECTED" : "UNAVAILABLE";
+  const cloudLabel = systemState.cloudConnected ? "CONNECTED" : "UNAVAILABLE";
+  const sensorLabel = systemState.sensorsActive ? "ACTIVE" : "DATA UNAVAILABLE";
+  const pumpLabel = systemState.pumpState === null ? "OFFLINE" : systemState.pumpState ? "ON" : "OFF";
+
+  if (elements.connectionLabel) elements.connectionLabel.textContent = `ESP32 ${esp32Label}`;
+  if (elements.heroStatusText) elements.heroStatusText.textContent = `ESP32 ${esp32Label}`;
+  if (elements.heroStatusMeta) elements.heroStatusMeta.textContent = systemState.esp32Online ? "LIVE DATA ACTIVE" : "COMMANDS LOCKED";
+  if (elements.heroStatus) elements.heroStatus.classList.toggle("is-online", systemState.esp32Online);
+  if (elements.heroStatus) elements.heroStatus.classList.toggle("is-offline", !systemState.esp32Online);
+  if (elements.connectionBadge) {
+    elements.connectionBadge.classList.toggle("is-online", systemState.esp32Online);
+    elements.connectionBadge.classList.toggle("is-offline", !systemState.esp32Online);
+  }
+
   const statuses = [
-    ["ESP32", systemState.esp32Online ? "ONLINE" : "OFFLINE"],
-    ["WI-FI", systemState.wifiConnected ? "CONNECTED" : "UNAVAILABLE"],
-    ["CLOUD", systemState.cloudConnected ? "CONNECTED" : "UNAVAILABLE"],
-    ["SENSORS", systemState.sensorsActive ? "ACTIVE" : "DATA UNAVAILABLE"],
-    ["PUMP", systemState.pumpState === null ? "OFFLINE" : systemState.pumpState ? "ON" : "OFF"],
+    ["ESP32", esp32Label],
+    ["WI-FI", wifiLabel],
+    ["CLOUD", cloudLabel],
+    ["SENSORS", sensorLabel],
+    ["PUMP", pumpLabel],
   ];
   const strip = document.querySelector("[data-status-strip]");
   if (strip) strip.innerHTML = statuses.map(([label, value]) => `<div><span>${label}</span><b>${value}</b></div>`).join("");
 
   Object.entries({
-    esp32: systemState.esp32Online ? "ONLINE" : "OFFLINE",
-    wifi: systemState.wifiConnected ? "CONNECTED" : "UNAVAILABLE",
-    cloud: systemState.cloudConnected ? "CONNECTED" : "UNAVAILABLE",
-    soilSensor: systemState.sensorsActive ? "ACTIVE" : "DATA UNAVAILABLE",
-    dht11: systemState.sensorsActive ? "ACTIVE" : "DATA UNAVAILABLE",
-    pump: systemState.pumpState === null ? "OFFLINE" : systemState.pumpState ? "ON" : "OFF",
+    esp32: esp32Label,
+    wifi: wifiLabel,
+    cloud: cloudLabel,
+    soilSensor: sensorLabel,
+    dht11: sensorLabel,
+    pump: pumpLabel,
   }).forEach(([key, value]) => setText(`[data-system-status="${key}"]`, value));
 
-  const pumpLabel = systemState.pumpState === null ? "OFFLINE" : systemState.pumpState ? "ON" : "OFF";
   if (elements.pumpState) {
     elements.pumpState.textContent = pumpLabel;
     elements.pumpState.classList.toggle("state-off", systemState.pumpState !== false);
   }
   if (elements.pumpButton) elements.pumpButton.disabled = !systemState.esp32Online;
+  if (elements.pumpButton) elements.pumpButton.textContent = systemState.esp32Online ? "PUMP CONTROL" : "PUMP CONTROL UNAVAILABLE";
+  if (elements.commandMessage) {
+    elements.commandMessage.textContent = systemState.esp32Online
+      ? "ESP32 is online. Commands can be sent when the secure backend allows it."
+      : "ESP32 is offline. Pump controls are disabled.";
+    elements.commandMessage.style.color = systemState.esp32Online ? "#73e0ac" : "#e8c078";
+  }
   if (elements.requirement) elements.requirement.textContent = systemState.irrigationRequirement || "UNAVAILABLE";
   if (elements.requirementCopy) elements.requirementCopy.textContent = systemState.irrigationRequirement || "UNAVAILABLE";
   if (elements.trend) elements.trend.textContent = systemState.moistureTrend || "UNAVAILABLE";
 }
 
-// These functions are the future secure API boundary. They intentionally return unavailable state today.
-async function getSystemStatus() { return null; }
+async function getSystemStatus() {
+  const response = await fetch(`${API_BASE_URL}/esp32-status`, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Unable to reach Blynk status endpoint.");
+  }
+  return response.json();
+}
+
 async function getSensorData() { return null; }
 async function getPumpStatus() { return null; }
-async function setPumpState() { throw new Error("ESP32 is offline. Command not sent."); }
+async function setPumpState(nextState) {
+  if (!systemState.esp32Online) {
+    throw new Error("ESP32 is offline. Command not sent.");
+  }
+  systemState.pumpState = nextState;
+  renderSystemState();
+  return nextState;
+}
 async function setIrrigationMode(mode) { systemState.irrigationMode = mode; renderSystemState(); return mode; }
+
+async function refreshHardwareStatus() {
+  try {
+    const status = await getSystemStatus();
+    const connected = Boolean(status && status.online);
+    systemState.esp32Online = connected;
+    systemState.wifiConnected = connected || Boolean(status && status.wifiConnected);
+    systemState.cloudConnected = connected || Boolean(status && status.cloudConnected);
+    systemState.sensorsActive = connected && Boolean(status && status.sensorsActive);
+    if (status && typeof status.pumpState !== "undefined") systemState.pumpState = Boolean(status.pumpState);
+    if (status && typeof status.soilMoisture !== "undefined") systemState.soilMoisture = status.soilMoisture;
+    if (status && typeof status.temperature !== "undefined") systemState.temperature = status.temperature;
+    if (status && typeof status.humidity !== "undefined") systemState.humidity = status.humidity;
+    renderSystemState();
+  } catch (error) {
+    systemState.esp32Online = false;
+    systemState.wifiConnected = false;
+    systemState.cloudConnected = false;
+    systemState.sensorsActive = false;
+    systemState.soilMoisture = null;
+    systemState.temperature = null;
+    systemState.humidity = null;
+    systemState.pumpState = null;
+    systemState.irrigationRequirement = null;
+    systemState.moistureTrend = null;
+    renderSystemState();
+  }
+}
+
+function beginHardwareStatusPolling() {
+  refreshHardwareStatus();
+  setInterval(refreshHardwareStatus, 5000);
+}
 
 function bindControls() {
   document.querySelectorAll("[data-mode]").forEach((button) => {
@@ -117,3 +188,4 @@ function bindControls() {
 
 renderSystemState();
 bindControls();
+beginHardwareStatusPolling();

@@ -36,6 +36,10 @@ a { color: inherit; text-decoration: none; }
 .project-info-link { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: .6rem; font-weight: 800; letter-spacing: .1em; transition: color .2s ease, border-color .2s ease; }
 .project-info-link:hover, .project-info-link:focus-visible { border-color: var(--line-strong); color: var(--green); }
 .status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px rgba(232, 192, 120, .48); }
+.connection-badge.is-online .status-dot,
+.hero-status.is-online .status-dot { background: var(--green); box-shadow: 0 0 10px rgba(115, 224, 172, .6); }
+.connection-badge.is-offline .status-dot,
+.hero-status.is-offline .status-dot { background: var(--danger); box-shadow: 0 0 10px rgba(242, 143, 140, .52); }
 .hero { position: relative; isolation: isolate; padding: clamp(48px, 10vw, 110px) 0 76px; overflow: hidden; }
 .hero::before, .hero::after { position: absolute; z-index: -2; content: ""; pointer-events: none; }
 .hero::before { top: -180px; right: -130px; width: 560px; height: 560px; border-radius: 50%; background: radial-gradient(circle, rgba(92, 224, 201, .2), rgba(38, 137, 133, .08) 38%, transparent 70%); filter: blur(10px); animation: heroAmbient 8s ease-in-out infinite alternate; }

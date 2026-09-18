@@ -18,7 +18,7 @@
           <a class="project-info-link" href="/Smart-Farming-IoT/">PROJECT INFO</a>
           <div class="connection-badge" data-connection-badge>
             <span class="status-dot"></span>
-            <span data-connection-label>LOCAL / OFFLINE</span>
+            <span data-connection-label>CHECKING...</span>
           </div>
         </div>
       </header>
@@ -28,8 +28,12 @@
           <div class="hero-gridline" aria-hidden="true"></div>
           <div class="eyebrow">PROJECT APP / CONTROL INTERFACE</div>
           <h1>Operational view for the smart irrigation prototype.</h1>
-          <p class="hero-copy">A mobile-first interface prepared for secure API data and commands. Hardware status is unavailable in this local build.</p>
-          <div class="hero-status"><span class="status-dot"></span><span>ESP32 OFFLINE</span><small>COMMANDS LOCKED</small></div>
+          <p class="hero-copy">Secure API polling checks the real Blynk Cloud hardware connection state for the ESP32.</p>
+          <div class="hero-status" data-hero-status>
+            <span class="status-dot"></span>
+            <span data-esp32-status-text>ESP32 OFFLINE</span>
+            <small data-esp32-status-meta>CHECKING...</small>
+          </div>
         </section>
 
         <section class="section" aria-labelledby="dashboard-title">
