@@ -22,8 +22,9 @@ button, a { font: inherit; }
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 
-.app-shell { width: min(100%, 1120px); margin: auto; padding: 0 18px 92px; }
-.topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; min-height: 72px; border-bottom: 1px solid var(--line); background: rgba(7, 17, 16, .92); backdrop-filter: blur(14px); }
+.app-shell { width: 100%; margin: 0; padding: 0 0 92px; }
+main { max-width: 1120px; margin: 0 auto; padding: 0 18px; }
+.topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 72px; padding: 0 18px; border-bottom: 1px solid var(--line); background: rgba(7, 17, 16, .92); backdrop-filter: blur(14px); }
 .brand { display: flex; align-items: center; gap: 10px; letter-spacing: .12em; }
 .brand b, .brand strong { display: block; }
 .brand b { color: var(--cyan); font-size: .62rem; font-weight: 700; }
