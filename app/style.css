@@ -40,6 +40,16 @@ a { color: inherit; text-decoration: none; }
 .hero-status.is-online .status-dot { background: var(--green); box-shadow: 0 0 10px rgba(115, 224, 172, .6); }
 .connection-badge.is-offline .status-dot,
 .hero-status.is-offline .status-dot { background: var(--danger); box-shadow: 0 0 10px rgba(242, 143, 140, .52); }
+.hero-status.is-server-error {
+  color: var(--danger);
+}
+.hero-status.is-server-error .status-dot {
+  background: var(--danger);
+  box-shadow: 0 0 10px rgba(242, 143, 140, .52);
+}
+.hero-status.is-server-error small {
+  color: rgba(242, 143, 140, .8);
+}
 .hero { position: relative; isolation: isolate; padding: clamp(48px, 10vw, 110px) 0 76px; overflow: hidden; }
 .hero::before, .hero::after { position: absolute; z-index: -2; content: ""; pointer-events: none; }
 .hero::before { top: -180px; right: -130px; width: 560px; height: 560px; border-radius: 50%; background: radial-gradient(circle, rgba(92, 224, 201, .2), rgba(38, 137, 133, .08) 38%, transparent 70%); filter: blur(10px); animation: heroAmbient 8s ease-in-out infinite alternate; }

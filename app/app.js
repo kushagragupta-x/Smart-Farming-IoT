@@ -70,12 +70,13 @@ function renderSystemState() {
   if (elements.heroStatus) {
     const online = !isChecking && !isServerError && systemState.esp32Online;
     elements.heroStatus.classList.toggle("is-online", online);
-    elements.heroStatus.classList.toggle("is-offline", !online && !isChecking);
+    elements.heroStatus.classList.toggle("is-offline", !online && !isChecking && !isServerError);
+    elements.heroStatus.classList.toggle("is-server-error", isServerError);
   }
   if (elements.connectionBadge) {
     const online = !isChecking && !isServerError && systemState.esp32Online;
     elements.connectionBadge.classList.toggle("is-online", online);
-    elements.connectionBadge.classList.toggle("is-offline", !online && !isChecking);
+    elements.connectionBadge.classList.toggle("is-offline", !online && !isChecking && !isServerError);
   }
 
   const statuses = [
