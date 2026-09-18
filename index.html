@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IoT BASED SMART IRRIGATION AND MULTI-LAYER FARMING SYSTEM</title>
+    <title>IoT-BASED SMART IRRIGATION AND MULTI-LAYER FARMING SYSTEM</title>
     <style>
       :root {
         --bg: #061712;
@@ -1576,6 +1576,588 @@
         .layer:nth-child(2) { width: 82%; }
         .layer:nth-child(3) { width: 68%; }
       }
+
+      /* Product presentation layer */
+      .hero { min-height: 92vh; }
+
+      .hero::after {
+        width: 680px;
+        height: 680px;
+        background: rgba(45, 205, 161, 0.09);
+      }
+
+      .hero-copy h1 {
+        max-width: 850px;
+        font-weight: 650;
+        text-wrap: balance;
+      }
+
+      .project-credit {
+        margin: 0 0 22px;
+        color: rgba(158, 203, 192, 0.72);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+      }
+
+      .hero-cta .button:first-child::after {
+        content: " ↓";
+        color: var(--cyan);
+      }
+
+      .exploded-section {
+        padding-top: 120px;
+        padding-bottom: 150px;
+      }
+
+      .exploded-stage {
+        min-height: 190vh;
+        position: relative;
+      }
+
+      .exploded-sticky {
+        position: sticky;
+        top: 8vh;
+        min-height: 82vh;
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+        gap: 26px;
+        align-items: center;
+      }
+
+      .exploded-viewport {
+        position: relative;
+        min-height: 620px;
+        border: 1px solid rgba(104, 230, 255, 0.2);
+        border-radius: 30px;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 42%, rgba(39, 123, 111, 0.18), transparent 42%), rgba(6, 17, 19, 0.72);
+        box-shadow: inset 0 0 80px rgba(47, 153, 180, 0.06), 0 30px 90px rgba(0, 0, 0, 0.28);
+        perspective: 1100px;
+      }
+
+      .exploded-viewport::before {
+        content: "SYSTEM ARCHITECTURE / EXPLODED VIEW";
+        position: absolute;
+        top: 20px;
+        left: 24px;
+        color: rgba(158, 203, 192, 0.65);
+        letter-spacing: 0.18em;
+        font-size: 0.62rem;
+      }
+
+      .exploded-viewport::after {
+        content: "SCROLL TO DECONSTRUCT";
+        position: absolute;
+        right: 24px;
+        bottom: 20px;
+        color: rgba(104, 230, 255, 0.72);
+        letter-spacing: 0.14em;
+        font-size: 0.58rem;
+      }
+
+      .exploded-stack {
+        position: absolute;
+        inset: 70px 7% 70px;
+        transform-style: preserve-3d;
+      }
+
+      .exploded-layer,
+      .exploded-pipe,
+      .exploded-component {
+        position: absolute;
+        left: 50%;
+        transform: translate3d(-50%, var(--lift, 0px), var(--depth, 0px)) rotateX(var(--tilt, 0deg));
+        transition: transform 0.08s linear, opacity 0.08s linear;
+        will-change: transform, opacity;
+      }
+
+      .exploded-layer {
+        width: var(--width);
+        height: 82px;
+        top: var(--top);
+        border: 1px solid rgba(126, 240, 176, 0.42);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: linear-gradient(110deg, rgba(16, 55, 46, 0.92), rgba(10, 31, 37, 0.92));
+        box-shadow: 0 18px 30px rgba(0, 0, 0, 0.26), inset 0 0 22px rgba(126, 240, 176, 0.08);
+      }
+
+      .exploded-layer span:last-child {
+        color: var(--muted);
+        letter-spacing: 0.16em;
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
+      .exploded-layer .leaf { font-size: 1.4rem; }
+
+      .exploded-pipe {
+        top: 38px;
+        width: 8px;
+        height: 450px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(104, 230, 255, 0.18), rgba(104, 230, 255, 0.84), rgba(126, 240, 176, 0.22));
+        box-shadow: 0 0 20px rgba(104, 230, 255, 0.42);
+        z-index: 0;
+      }
+
+      .exploded-pipe::before,
+      .exploded-pipe::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        width: 160px;
+        height: 3px;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, transparent, rgba(104, 230, 255, 0.8), transparent);
+      }
+
+      .exploded-pipe::before { top: 140px; }
+      .exploded-pipe::after { top: 275px; }
+
+      .exploded-component {
+        width: 136px;
+        min-height: 70px;
+        padding: 12px;
+        border: 1px solid rgba(122, 255, 214, 0.34);
+        border-radius: 14px;
+        background: rgba(8, 25, 28, 0.94);
+        color: var(--muted);
+        text-align: center;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 0 22px rgba(104, 230, 255, 0.08);
+        z-index: 2;
+      }
+
+      .component-storage { top: 8px; left: 20%; }
+      .component-controller { top: 420px; left: 78%; }
+      .component-sensor { top: 286px; left: 18%; }
+      .component-climate { top: 174px; left: 84%; }
+      .component-relay { top: 365px; left: 12%; }
+      .component-pump { top: 492px; left: 50%; }
+
+      .exploded-labels {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .exploded-labels .label-intro {
+        margin-bottom: 14px;
+        color: var(--muted);
+        max-width: 340px;
+      }
+
+      .exploded-label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 48px;
+        padding: 10px 12px;
+        border-left: 1px solid rgba(104, 230, 255, 0.16);
+        color: rgba(233, 255, 251, 0.28);
+        letter-spacing: 0.12em;
+        font-size: 0.68rem;
+        transition: color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+      }
+
+      .exploded-label::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 0 currentColor;
+        transition: box-shadow 0.25s ease;
+      }
+
+      .exploded-label::after {
+        content: "";
+        flex: 1;
+        min-width: 18px;
+        height: 1px;
+        background: linear-gradient(90deg, currentColor, transparent);
+        opacity: 0.42;
+      }
+
+      .exploded-label.is-active {
+        color: var(--green);
+        border-color: var(--green);
+        transform: translateX(6px);
+      }
+
+      .exploded-label.is-active::before { box-shadow: 0 0 14px var(--green); }
+
+      .section-note {
+        max-width: 560px;
+        margin: -22px auto 30px;
+        color: var(--cyan);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .demo-note {
+        display: inline-flex;
+        margin-top: 16px;
+        color: var(--cyan);
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .presentation-control {
+        pointer-events: none;
+      }
+
+      .logic-panel {
+        display: grid;
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .logic-step {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 14px 0;
+        border-top: 1px solid rgba(104, 230, 255, 0.14);
+      }
+
+      .logic-step:last-child { border-bottom: 1px solid rgba(104, 230, 255, 0.14); }
+
+      .logic-step b {
+        color: var(--cyan);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+      }
+
+      .logic-step strong {
+        display: block;
+        color: var(--text);
+        font-size: 0.82rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .logic-step span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .technical-section { padding-top: 90px; }
+
+      .component-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .component-card {
+        min-height: 280px;
+        padding: 16px;
+        border: 1px solid rgba(120, 239, 255, 0.14);
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(14, 31, 31, 0.9), rgba(7, 16, 18, 0.92));
+        transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+      }
+
+      .component-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(126, 240, 176, 0.38);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.22);
+      }
+
+      .component-visual {
+        position: relative;
+        height: 112px;
+        margin-bottom: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(104, 230, 255, 0.12);
+        border-radius: 12px;
+        background: radial-gradient(circle at 50% 38%, rgba(104, 230, 255, 0.1), transparent 58%), #081419;
+      }
+
+      .component-visual::before,
+      .component-visual::after { content: ""; position: absolute; }
+
+      .visual-board::before {
+        inset: 25px 33px;
+        border: 2px solid #6ddab5;
+        border-radius: 6px;
+        background: repeating-linear-gradient(90deg, transparent 0 14px, rgba(104, 230, 255, 0.2) 15px 16px), #11382f;
+        box-shadow: 0 0 18px rgba(104, 230, 255, 0.18);
+      }
+
+      .visual-board::after {
+        width: 8px;
+        height: 8px;
+        left: 51px;
+        top: 42px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 36px 0 var(--green), 72px 0 var(--cyan), 108px 0 var(--green);
+      }
+
+      .visual-sensor::before {
+        width: 18px;
+        height: 75px;
+        left: 54px;
+        top: 20px;
+        border: 2px solid #a7d4c6;
+        border-radius: 3px;
+        background: repeating-linear-gradient(180deg, #31584f 0 5px, #163b35 6px 10px);
+        transform: rotate(-8deg);
+      }
+
+      .visual-sensor::after {
+        width: 90px;
+        height: 2px;
+        left: 73px;
+        top: 58px;
+        background: var(--cyan);
+        box-shadow: 0 0 10px var(--cyan);
+      }
+
+      .visual-dht::before {
+        width: 58px;
+        height: 70px;
+        left: 50px;
+        top: 22px;
+        border: 2px solid #e3f6ef;
+        border-radius: 7px;
+        background: repeating-linear-gradient(90deg, rgba(33, 99, 84, 0.8) 0 3px, transparent 3px 8px), #19342f;
+      }
+
+      .visual-dht::after {
+        width: 8px;
+        height: 8px;
+        left: 67px;
+        top: 52px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 22px 0 var(--cyan);
+      }
+
+      .visual-oled::before {
+        inset: 24px 32px;
+        border: 2px solid #a5d9ce;
+        border-radius: 4px;
+        background: linear-gradient(180deg, rgba(104, 230, 255, 0.28), rgba(10, 50, 50, 0.86));
+      }
+
+      .visual-oled::after {
+        width: 50px;
+        height: 2px;
+        left: 52px;
+        top: 50px;
+        background: var(--cyan);
+        box-shadow: 0 8px var(--green), 0 16px rgba(104, 230, 255, 0.6);
+      }
+
+      .visual-relay::before {
+        inset: 25px 34px;
+        border: 2px solid #72d9b3;
+        border-radius: 5px;
+        background: #173b33;
+      }
+
+      .visual-relay::after {
+        width: 22px;
+        height: 22px;
+        left: 55px;
+        top: 42px;
+        border: 2px solid var(--cyan);
+        border-radius: 50%;
+        box-shadow: 32px 0 0 -6px #173b33, 32px 0 0 -4px var(--cyan);
+      }
+
+      .visual-pump::before {
+        width: 70px;
+        height: 48px;
+        left: 44px;
+        top: 34px;
+        border: 2px solid #84e7c4;
+        border-radius: 12px 20px 20px 12px;
+        background: linear-gradient(135deg, #285a4b, #102923);
+      }
+
+      .visual-pump::after {
+        width: 52px;
+        height: 12px;
+        left: 108px;
+        top: 51px;
+        border: 2px solid var(--cyan);
+        border-left: 0;
+        border-radius: 0 12px 12px 0;
+      }
+
+      .visual-pipe::before {
+        width: 210px;
+        height: 22px;
+        left: 24px;
+        top: 45px;
+        border: 3px solid rgba(104, 230, 255, 0.78);
+        border-radius: 999px;
+        transform: rotate(-12deg);
+        box-shadow: 0 0 16px rgba(104, 230, 255, 0.22), inset 0 0 12px rgba(104, 230, 255, 0.16);
+      }
+
+      .visual-pipe::after {
+        width: 7px;
+        height: 7px;
+        left: 84px;
+        top: 57px;
+        border-radius: 50%;
+        background: #d8ffff;
+        box-shadow: 42px 0 #d8ffff, 84px 0 #d8ffff;
+      }
+
+      .component-card h3 {
+        margin: 0 0 9px;
+        color: var(--text);
+        font-size: 0.85rem;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      .component-card p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+      .component-card p + p { margin-top: 8px; }
+      .component-card p strong { color: var(--cyan); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+      .architecture-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .architecture-panel {
+        padding: 22px;
+        border: 1px solid rgba(120, 239, 255, 0.14);
+        border-radius: 20px;
+        background: rgba(8, 20, 23, 0.84);
+      }
+
+      .architecture-panel h3 { margin: 0 0 20px; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
+
+      .architecture-flow {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .architecture-node {
+        min-height: 62px;
+        display: grid;
+        place-items: center;
+        padding: 8px;
+        border: 1px solid rgba(126, 240, 176, 0.24);
+        border-radius: 10px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 0.58rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+      }
+
+      .architecture-arrow { color: var(--cyan); font-size: 1.1rem; }
+
+      .digital-flow { display: grid; gap: 10px; }
+      .digital-flow .architecture-node { min-height: 48px; }
+      .digital-flow .architecture-arrow { text-align: center; transform: rotate(90deg); }
+
+      .software-grid,
+      .stack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+      .software-item,
+      .stack-item {
+        padding: 18px;
+        border-left: 2px solid var(--cyan);
+        background: rgba(12, 29, 29, 0.7);
+      }
+
+      .software-item strong,
+      .stack-item strong { display: block; color: var(--text); font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; }
+      .software-item span,
+      .stack-item span { display: block; margin-top: 7px; color: var(--muted); font-size: 0.86rem; }
+
+      .code-path {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .code-path span {
+        padding: 10px 13px;
+        border: 1px solid rgba(126, 240, 176, 0.25);
+        border-radius: 8px;
+        color: var(--green);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+      }
+
+      .code-path b { color: var(--cyan); }
+
+      @media (max-width: 980px) {
+        .component-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .architecture-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 700px) {
+        .component-grid,
+        .software-grid,
+        .stack-grid { grid-template-columns: 1fr; }
+        .architecture-flow { grid-template-columns: 1fr; }
+        .architecture-arrow { transform: rotate(90deg); justify-self: center; }
+      }
+
+      @media (max-width: 800px) {
+        .exploded-sticky {
+          grid-template-columns: 1fr;
+          align-content: center;
+        }
+
+        .exploded-viewport { min-height: 510px; }
+        .exploded-stack { inset: 66px 2% 60px; }
+        .exploded-layer { height: 68px; }
+        .exploded-pipe { height: 370px; }
+        .component-controller { top: 350px; }
+        .component-storage { left: 15%; }
+        .component-sensor { left: 10%; top: 245px; }
+        .component-climate { left: 85%; top: 150px; }
+        .component-relay { left: 10%; top: 315px; }
+        .component-pump { top: 410px; }
+        .exploded-labels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .exploded-labels .label-intro { grid-column: 1 / -1; }
+        .exploded-label { min-height: 38px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .exploded-stage { min-height: auto; }
+        .exploded-sticky { position: relative; top: auto; }
+        .exploded-layer,
+        .exploded-pipe,
+        .exploded-component { transition: none; transform: translate3d(-50%, 0, 0); }
+      }
     </style>
   </head>
   <body>
@@ -1585,6 +2167,7 @@
       <header class="hero">
         <div class="container hero-grid">
           <div class="hero-copy reveal">
+            <p class="project-credit">PROJECT BY TEAM PROTOTYPE • IX-F</p>
             <div class="brand-tag"><span class="dot"></span> SYSTEM READY</div>
             <h1>
               IoT-BASED SMART IRRIGATION<br />
@@ -1592,8 +2175,8 @@
             </h1>
             <div class="team-line">TEAM PROTOTYPE • IX-F</div>
             <div class="hero-cta">
-              <button class="button primary" type="button">Live System</button>
-              <button class="button" type="button">Monitoring</button>
+              <button class="button primary" type="button" data-scroll-target="#exploded-system">Explore the system</button>
+              <a class="button" href="#monitoring">Monitoring</a>
             </div>
           </div>
 
@@ -1664,12 +2247,12 @@
               </div>
 
               <div class="farm-display">
-                <div class="leaf">🌱</div>
+                <div class="leaf">FARM</div>
                 <div class="text-block">
                   <small>Layered Farm</small>
                   <strong>3 Layers Active</strong>
                 </div>
-                <div class="leaf">💧</div>
+                <div class="leaf">FLOW</div>
               </div>
 
               <div class="data-stream">
@@ -1681,18 +2264,19 @@
       </header>
 
       <main>
-        <section class="section">
+        <section class="section" id="monitoring">
           <div class="container">
             <div class="section-header reveal">
               <div class="eyebrow">Dashboard Overview</div>
               <h2>Live Farm Monitoring</h2>
             </div>
+            <p class="section-note reveal">Illustrative sensor readings • Project Info demonstration values</p>
 
             <div class="live-metric-grid reveal">
               <article class="sensor-card">
                 <div class="sensor-card-header">
                   <h3>Temperature</h3>
-                  <div class="sensor-icon">🌡️</div>
+                  <div class="sensor-icon">T</div>
                 </div>
                 <div class="gauge-wrap">
                   <div class="gauge">
@@ -1715,7 +2299,7 @@
               <article class="sensor-card">
                 <div class="sensor-card-header">
                   <h3>Humidity</h3>
-                  <div class="sensor-icon">💧</div>
+                  <div class="sensor-icon">H</div>
                 </div>
                 <div class="gauge-wrap">
                   <div class="gauge">
@@ -1738,7 +2322,7 @@
               <article class="sensor-card">
                 <div class="sensor-card-header">
                   <h3>Soil Moisture</h3>
-                  <div class="sensor-icon">🌱</div>
+                  <div class="sensor-icon">S</div>
                 </div>
                 <div class="gauge-wrap">
                   <div class="gauge">
@@ -1757,6 +2341,131 @@
                   <span>100%</span>
                 </div>
               </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Physical System</div>
+              <h2>Hardware Architecture</h2>
+            </div>
+
+            <div class="component-grid reveal">
+              <article class="component-card">
+                <div class="component-visual visual-board" aria-label="Technical illustration of an ESP32 development board"></div>
+                <h3>ESP32</h3>
+                <p><strong>Purpose</strong> Central microcontroller for the system.</p>
+                <p><strong>Role in system</strong> Processes sensor data, communicates over Wi-Fi and coordinates irrigation logic.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-sensor" aria-label="Technical illustration of a soil moisture sensor"></div>
+                <h3>Soil Moisture Sensor</h3>
+                <p><strong>Purpose</strong> Measures the moisture condition of the soil.</p>
+                <p><strong>Role in system</strong> Supplies the information used to determine irrigation requirements.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-dht" aria-label="Technical illustration of a DHT11 sensor"></div>
+                <h3>DHT11</h3>
+                <p><strong>Purpose</strong> Measures temperature and humidity.</p>
+                <p><strong>Role in system</strong> Provides environmental readings around the cultivation area.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-oled" aria-label="Technical illustration of an OLED display"></div>
+                <h3>OLED Display</h3>
+                <p><strong>Purpose</strong> Local display for selected system information.</p>
+                <p><strong>Role in system</strong> Presents readings and status close to the physical prototype.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-relay" aria-label="Technical illustration of a relay module"></div>
+                <h3>Relay Module</h3>
+                <p><strong>Purpose</strong> Switching interface for the pump circuit.</p>
+                <p><strong>Role in system</strong> Provides the interface used by the controller to operate the water pump.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-pump" aria-label="Technical illustration of a small water pump"></div>
+                <h3>Water Pump</h3>
+                <p><strong>Purpose</strong> Moves stored water through the irrigation network.</p>
+                <p><strong>Role in system</strong> Supplies water to the farming layers when irrigation is required.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-pipe" aria-label="Technical illustration of transparent flexible irrigation pipe"></div>
+                <h3>Transparent Flexible Pipe</h3>
+                <p><strong>Purpose</strong> Carries irrigation water through the structure.</p>
+                <p><strong>Role in system</strong> Distributes water across the multi-layer cultivation levels.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">System Integration</div>
+              <h2>Hardware Data Flow</h2>
+            </div>
+
+            <div class="architecture-grid reveal">
+              <div class="architecture-panel">
+                <h3>Physical irrigation path</h3>
+                <div class="architecture-flow">
+                  <div class="architecture-node">SOIL MOISTURE SENSOR</div><span class="architecture-arrow">→</span>
+                  <div class="architecture-node">DHT11</div><span class="architecture-arrow">→</span>
+                  <div class="architecture-node">ESP32</div><span class="architecture-arrow">→</span>
+                  <div class="architecture-node">RELAY</div><span class="architecture-arrow">→</span>
+                  <div class="architecture-node">WATER PUMP</div>
+                </div>
+                <div class="code-path"><span>WATER PUMP</span><b>→</b><span>IRRIGATION SYSTEM</span></div>
+              </div>
+              <div class="architecture-panel">
+                <h3>IoT communication path</h3>
+                <div class="digital-flow">
+                  <div class="architecture-node">ESP32</div><span class="architecture-arrow">→</span>
+                  <div class="architecture-node">WI-FI</div><span class="architecture-arrow">↕</span>
+                  <div class="architecture-node">BLYNK CLOUD</div><span class="architecture-arrow">↕</span>
+                  <div class="architecture-node">REMOTE MONITORING / CONTROL</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Digital Infrastructure</div>
+              <h2>Software &amp; Digital Infrastructure</h2>
+            </div>
+
+            <div class="software-grid reveal">
+              <div class="software-item"><strong>Arduino IDE</strong><span>Used to program and upload firmware to the ESP32.</span></div>
+              <div class="software-item"><strong>Blynk</strong><span>Cloud-connected IoT platform for device communication, monitoring and future remote control.</span></div>
+              <div class="software-item"><strong>ESP32 Wi-Fi</strong><span>Provides network connectivity between the physical system and the cloud platform.</span></div>
+              <div class="software-item"><strong>GitHub</strong><span>Source-code version control and project development.</span></div>
+              <div class="software-item"><strong>GitHub Pages</strong><span>Public hosting for this Project Info website.</span></div>
+              <div class="software-item"><strong>Web Technologies</strong><span>HTML, CSS and JavaScript power the Project Info interface.</span></div>
+            </div>
+
+            <div class="code-path reveal" aria-label="Website publishing path">
+              <span>CODE</span><b>↓</b><span>GITHUB</span><b>↓</b><span>GITHUB PAGES</span><b>↓</b><span>PROJECT INFO WEBSITE</span>
+            </div>
+            <p class="about-box reveal" style="margin-top: 22px; padding: 20px 24px;">GitHub and GitHub Pages host this explanation website. Separately, the ESP32 uses Wi-Fi to communicate with the Blynk cloud layer for IoT monitoring and future remote interaction. GitHub does not control the ESP32.</p>
+          </div>
+        </section>
+
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">System Inventory</div>
+              <h2>Project Technology Stack</h2>
+            </div>
+            <div class="stack-grid reveal">
+              <div class="stack-item"><strong>Hardware</strong><span>ESP32 • Soil Moisture Sensor • DHT11 • Relay • Pump • OLED</span></div>
+              <div class="stack-item"><strong>Firmware</strong><span>Arduino IDE</span></div>
+              <div class="stack-item"><strong>IoT</strong><span>Blynk • Wi-Fi</span></div>
+              <div class="stack-item"><strong>Web</strong><span>HTML • CSS • JavaScript</span></div>
+              <div class="stack-item"><strong>Hosting</strong><span>GitHub • GitHub Pages</span></div>
             </div>
           </div>
         </section>
@@ -1781,26 +2490,21 @@
                   </div>
                 </div>
 
-                <div class="toggle-group">
-                  <button class="mode-btn active" type="button">AUTO</button>
-                  <button class="mode-btn" type="button">MANUAL</button>
-                </div>
-
-                <div class="toggle-group">
-                  <button class="action-btn primary" type="button">PUMP ON</button>
-                  <button class="action-btn danger" type="button">PUMP OFF</button>
-                </div>
-
                 <p style="margin: 18px 0 0; color: var(--muted); font-size: 0.98rem; line-height: 1.8;">
-                  The system monitors soil moisture and manages irrigation according to the water requirements of the crops.
+                  The soil moisture sensor monitors the moisture condition of the soil. The ESP32 processes the sensor data and can initiate irrigation when watering is required. This approach helps reduce unnecessary water usage.
                 </p>
+
+                <div class="logic-panel">
+                  <div class="logic-step"><b>01</b><div><strong>AUTOMATIC OPERATION</strong><span>Irrigation can be initiated when the measured soil condition indicates that watering is required.</span></div></div>
+                  <div class="logic-step"><b>02</b><div><strong>MANUAL OPERATION</strong><span>Manual operation is a system capability for the separate Project App, not an interactive control on this page.</span></div></div>
+                </div>
               </div>
 
               <div class="pipe-visual futuristic-panel">
-                <div class="pipe-node"><span class="icon">🌧️</span></div>
-                <div class="pipe-node"><span class="icon">💧</span></div>
-                <div class="pipe-node"><span class="icon">📡</span></div>
-                <div class="pipe-node"><span class="icon">🌱</span></div>
+                <div class="pipe-node"><span class="icon">RAIN</span></div>
+                <div class="pipe-node"><span class="icon">TANK</span></div>
+                <div class="pipe-node"><span class="icon">ESP32</span></div>
+                <div class="pipe-node"><span class="icon">FARM</span></div>
 
                 <div class="water-flow" aria-hidden="true">
                   <span class="water-drop"></span>
@@ -1814,7 +2518,7 @@
           </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="water-management">
           <div class="container">
             <div class="section-header reveal">
               <div class="eyebrow">Water System</div>
@@ -1823,55 +2527,65 @@
 
             <div class="flow-diagram reveal">
               <div class="flow-step">
-                <span class="icon">🌧️</span>
+                <span class="icon">RAIN</span>
                 <strong>Rainwater<br />Harvesting</strong>
               </div>
               <div class="flow-step">
-                <span class="icon">🛢️</span>
+                <span class="icon">TANK</span>
                 <strong>Water<br />Storage</strong>
               </div>
               <div class="flow-step">
-                <span class="icon">📡</span>
+                <span class="icon">ESP32</span>
                 <strong>ESP32<br />Monitoring</strong>
               </div>
               <div class="flow-step">
-                <span class="icon">🚰</span>
+                <span class="icon">PUMP</span>
                 <strong>Smart<br />Irrigation</strong>
               </div>
               <div class="flow-step">
-                <span class="icon">🌿</span>
+                <span class="icon">LAYERS</span>
                 <strong>Multi-Layer<br />Farm</strong>
               </div>
             </div>
           </div>
         </section>
 
-        <section class="section">
+        <section class="section exploded-section" id="exploded-system">
           <div class="container">
             <div class="section-header reveal">
-              <div class="eyebrow">Cultivation Design</div>
-              <h2>Multi-Layer Farming</h2>
+              <div class="eyebrow">System Demonstration</div>
+              <h2>Exploded Farm Architecture</h2>
             </div>
 
-            <div class="farming-visual reveal">
-              <div class="farm-stack futuristic-panel">
-                <div class="water-feed" aria-hidden="true">
-                  <span class="branch"></span>
-                  <span class="branch"></span>
-                  <span class="branch"></span>
+            <div class="exploded-stage reveal" data-exploded-stage>
+              <div class="exploded-sticky">
+                <div class="exploded-viewport" aria-label="Scroll-driven exploded view of the farming system">
+                  <div class="exploded-stack">
+                    <div class="exploded-pipe" data-exploded-part="pipe" aria-hidden="true"></div>
+                    <div class="exploded-component component-storage" data-exploded-part="storage">WATER STORAGE<br /><small>rainwater reuse</small></div>
+                    <div class="exploded-component component-sensor" data-exploded-part="sensor">SOIL SENSOR<br /><small>moisture reading</small></div>
+                    <div class="exploded-component component-controller" data-exploded-part="controller">ESP32 CONTROLLER<br /><small>signal processing</small></div>
+                    <div class="exploded-component component-climate" data-exploded-part="climate">TEMPERATURE &amp; HUMIDITY<br /><small>DHT11 sensor</small></div>
+                    <div class="exploded-component component-relay" data-exploded-part="relay">RELAY MODULE<br /><small>switching interface</small></div>
+                    <div class="exploded-component component-pump" data-exploded-part="pump">WATER PUMP<br /><small>irrigation supply</small></div>
+                    <div class="exploded-layer" style="--top: 118px; --width: 88%;" data-exploded-part="layer-3"><span class="leaf">L3</span><span>LAYER 3</span></div>
+                    <div class="exploded-layer" style="--top: 222px; --width: 75%;" data-exploded-part="layer-2"><span class="leaf">L2</span><span>LAYER 2</span></div>
+                    <div class="exploded-layer" style="--top: 326px; --width: 62%;" data-exploded-part="layer-1"><span class="leaf">L1</span><span>LAYER 1</span></div>
+                  </div>
                 </div>
 
-                <div class="layer">
-                  <span class="leaf">🌱</span>
-                  <span>LAYER 3</span>
-                </div>
-                <div class="layer">
-                  <span class="leaf">🌱</span>
-                  <span>LAYER 2</span>
-                </div>
-                <div class="layer">
-                  <span class="leaf">🌱</span>
-                  <span>LAYER 1</span>
+                <div class="exploded-labels">
+                  <p class="label-intro">A scroll-controlled look beneath the structure. Every subsystem remains aligned as it moves into view.</p>
+                  <div class="exploded-label" data-label-for="layer-3">LAYER 3</div>
+                  <div class="exploded-label" data-label-for="layer-2">LAYER 2</div>
+                  <div class="exploded-label" data-label-for="layer-1">LAYER 1</div>
+                  <div class="exploded-label" data-label-for="pipe">WATER DISTRIBUTION</div>
+                  <div class="exploded-label" data-label-for="storage">WATER STORAGE</div>
+                  <div class="exploded-label" data-label-for="sensor">SOIL MOISTURE SENSOR</div>
+                  <div class="exploded-label" data-label-for="climate">TEMPERATURE &amp; HUMIDITY SENSOR</div>
+                  <div class="exploded-label" data-label-for="controller">ESP32 CONTROLLER</div>
+                  <div class="exploded-label" data-label-for="relay">RELAY MODULE</div>
+                  <div class="exploded-label" data-label-for="pump">WATER PUMP</div>
                 </div>
               </div>
             </div>
@@ -1940,40 +2654,40 @@
 
             <div class="feature-grid reveal">
               <article class="feature-card">
-                <div class="icon">🌱</div>
+                <div class="icon">SOIL</div>
                 <h4>Soil Moisture Monitoring</h4>
               </article>
               <article class="feature-card">
-                <div class="icon">🌡️</div>
+                <div class="icon">TEMP</div>
                 <h4>Temperature Monitoring</h4>
               </article>
               <article class="feature-card">
-                <div class="icon">💧</div>
+                <div class="icon">HUM</div>
                 <h4>Humidity Monitoring</h4>
               </article>
               <article class="feature-card">
-                <div class="icon">🚰</div>
+                <div class="icon">FLOW</div>
                 <h4>Smart Irrigation</h4>
               </article>
               <article class="feature-card">
-                <div class="icon">🌧️</div>
+                <div class="icon">RAIN</div>
                 <h4>Rainwater Harvesting</h4>
               </article>
               <article class="feature-card">
-                <div class="icon">🏢</div>
+                <div class="icon">L3</div>
                 <h4>Multi-Layer Farming</h4>
               </article>
               <article class="feature-card">
-                <div class="icon">📡</div>
+                <div class="icon">WIFI</div>
                 <h4>ESP32 IoT Connectivity</h4>
               </article>
               <article class="feature-card">
-                <div class="icon">📱</div>
+                <div class="icon">APP</div>
                 <h4>Remote Monitoring</h4>
               </article>
               <article class="feature-card">
-                <div class="icon">⚙️</div>
-                <h4>Automatic / Manual Pump Control</h4>
+                <div class="icon">AUTO</div>
+                <h4>Automatic Irrigation Concept</h4>
               </article>
             </div>
           </div>
@@ -2078,7 +2792,7 @@
       <footer>
         <div class="container">
           <div class="footer-box reveal">
-            <div class="brand">Made with ❤️ by Team Prototype</div>
+            <div class="brand">Made by Team Prototype</div>
             <div class="meta">Team Prototype • IX-F • IoT • Smart Farming • ESP32</div>
           </div>
         </div>
@@ -2194,10 +2908,96 @@
         reveals.forEach((el) => observer.observe(el));
       }
 
+      function initExplodedView() {
+        const stage = document.querySelector('[data-exploded-stage]');
+        if (!stage || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const parts = [...stage.querySelectorAll('[data-exploded-part]')];
+        const labels = [...stage.querySelectorAll('[data-label-for]')];
+        let frame = 0;
+
+        const update = () => {
+          frame = 0;
+          const bounds = stage.getBoundingClientRect();
+          const travel = Math.max(stage.offsetHeight - window.innerHeight, 1);
+          const progress = Math.max(0, Math.min(1, -bounds.top / travel));
+          const lifts = {
+            'layer-3': -150 * progress,
+            'layer-2': -96 * progress,
+            'layer-1': -45 * progress,
+            pipe: 34 * progress,
+            storage: -105 * progress,
+            sensor: 92 * progress,
+            climate: -78 * progress,
+            controller: 118 * progress,
+            relay: 145 * progress,
+            pump: 185 * progress
+          };
+
+          parts.forEach((part) => {
+            const name = part.dataset.explodedPart;
+            const lift = lifts[name] || 0;
+            const depth = name === 'pipe' ? 26 * progress : 0;
+            const tilt = name.startsWith('layer') ? `${(name === 'layer-3' ? -2 : 1) * progress}deg` : '0deg';
+            const revealStart = {
+              'layer-3': 0,
+              'layer-2': 0,
+              'layer-1': 0,
+              pipe: 0.16,
+              storage: 0.28,
+              climate: 0.4,
+              sensor: 0.52,
+              controller: 0.66,
+              relay: 0.76,
+              pump: 0.84
+            }[name] || 0;
+            const opacity = progress < revealStart ? 0.35 : 1;
+            part.style.setProperty('--lift', `${lift}px`);
+            part.style.setProperty('--depth', `${depth}px`);
+            part.style.setProperty('--tilt', tilt);
+            part.style.opacity = opacity;
+          });
+
+          labels.forEach((label) => {
+            const name = label.dataset.labelFor;
+            const active = name === 'layer-3' ? progress > 0.12
+              : name === 'layer-2' ? progress > 0.22
+                : name === 'layer-1' ? progress > 0.32
+                  : name === 'pipe' ? progress > 0.4
+                    : name === 'storage' ? progress > 0.52
+                      : name === 'climate' ? progress > 0.62
+                        : name === 'sensor' ? progress > 0.68
+                          : name === 'controller' ? progress > 0.76
+                            : name === 'relay' ? progress > 0.84
+                              : progress > 0.9;
+            label.classList.toggle('is-active', active);
+          });
+        };
+
+        const requestUpdate = () => {
+          if (!frame) frame = requestAnimationFrame(update);
+        };
+
+        window.addEventListener('scroll', requestUpdate, { passive: true });
+        window.addEventListener('resize', requestUpdate);
+        requestUpdate();
+      }
+
+      function initScrollLinks() {
+        document.querySelectorAll('[data-scroll-target]').forEach((link) => {
+          link.addEventListener('click', () => {
+            const target = document.querySelector(link.dataset.scrollTarget);
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        });
+      }
+
       createParticles();
       initGauges();
       initReveal();
       initCounterReveal();
+      initExplodedView();
+      initScrollLinks();
     </script>
   </body>
 </html>
