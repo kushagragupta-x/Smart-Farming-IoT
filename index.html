@@ -110,15 +110,13 @@
       }
 
       .reveal {
-        opacity: 0;
-        transform: translateY(18px);
-        transition: opacity 0.35s ease-out, transform 0.35s ease-out;
-        will-change: opacity, transform;
+        opacity: 1;
+        transform: none;
       }
 
       .reveal.visible {
         opacity: 1;
-        transform: translateY(0);
+        transform: none;
       }
 
       .hero-copy,
@@ -1612,7 +1610,8 @@
       }
 
       .exploded-stage {
-        min-height: 190vh;
+        height: calc(100vh + 300px);
+        min-height: 0;
         position: relative;
       }
 
@@ -2339,6 +2338,7 @@
         .component-grid,
         .software-grid,
         .stack-grid { grid-template-columns: 1fr; }
+        .steps-grid .step-card[style] { grid-column: auto !important; }
         .architecture-flow { grid-template-columns: 1fr; }
         .architecture-arrow { transform: rotate(90deg); justify-self: center; }
         .adaptive-equation { grid-template-columns: repeat(2, 1fr); }
@@ -2347,6 +2347,10 @@
       }
 
       @media (max-width: 800px) {
+        .exploded-stage {
+          height: calc(100vh + 300px);
+        }
+
         .exploded-sticky {
           grid-template-columns: 1fr;
           align-content: center;
@@ -2369,7 +2373,7 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .exploded-stage { min-height: auto; }
+        .exploded-stage { height: auto; }
         .exploded-sticky { position: relative; top: auto; }
         .exploded-layer,
         .exploded-pipe,
@@ -3252,9 +3256,6 @@
 
       function initReveal() {
         const reveals = document.querySelectorAll('.reveal');
-        reveals.forEach((el, index) => {
-          el.style.transitionDelay = `${index * 70}ms`;
-        });
 
         const observer = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
@@ -3263,7 +3264,7 @@
               observer.unobserve(entry.target);
             }
           });
-        }, { threshold: 0.12 });
+        }, { rootMargin: '0px 0px 200px 0px', threshold: 0.05 });
 
         reveals.forEach((el) => observer.observe(el));
       }
