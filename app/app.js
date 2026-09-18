@@ -1,4 +1,6 @@
-const API_BASE_URL = "/api";
+const BLYNK_TEMPLATE_ID = "TMPL3PRnnCUPe";
+const BLYNK_AUTH_TOKEN = (typeof window !== "undefined" && window.BLYNK_AUTH_TOKEN) ? String(window.BLYNK_AUTH_TOKEN).trim() : "";
+const BLYNK_API_BASE = "https://blynk.cloud/external/api";
 
 const systemState = {
   connected: false,
@@ -51,7 +53,6 @@ function renderSystemState() {
   setText("[data-status=humidity]", systemState.humidity === null ? "DATA UNAVAILABLE" : "SENSOR OK");
 
   const isChecking = systemState.statusState === "CHECKING";
-  const isServerError = systemState.statusState === "SERVER OFFLINE / CONNECTION ERROR";
   const esp32Label = isChecking ? "CHECKING" : systemState.esp32Online ? "ONLINE" : "OFFLINE";
   const wifiLabel = isChecking ? "CHECKING" : systemState.wifiConnected ? "CONNECTED" : "UNAVAILABLE";
   const cloudLabel = isChecking ? "CHECKING" : systemState.cloudConnected ? "CONNECTED" : "UNAVAILABLE";
@@ -59,24 +60,24 @@ function renderSystemState() {
   const pumpLabel = isChecking ? "CHECKING" : systemState.pumpState === null ? "OFFLINE" : systemState.pumpState ? "ON" : "OFF";
 
   if (elements.connectionLabel) {
-    elements.connectionLabel.textContent = isChecking ? "CHECKING..." : isServerError ? "SERVER OFFLINE / CONNECTION ERROR" : `ESP32 ${esp32Label}`;
+    elements.connectionLabel.textContent = isChecking ? "CHECKING..." : `ESP32 ${esp32Label}`;
   }
   if (elements.heroStatusText) {
-    elements.heroStatusText.textContent = isChecking ? "ESP32 CHECKING" : isServerError ? "SERVER OFFLINE" : `ESP32 ${esp32Label}`;
+    elements.heroStatusText.textContent = isChecking ? "ESP32 CHECKING" : `ESP32 ${esp32Label}`;
   }
   if (elements.heroStatusMeta) {
-    elements.heroStatusMeta.textContent = isChecking ? "CHECKING..." : isServerError ? "CONNECTION ERROR" : systemState.esp32Online ? "LIVE DATA ACTIVE" : "COMMANDS LOCKED";
+    elements.heroStatusMeta.textContent = isChecking ? "CHECKING..." : systemState.esp32Online ? "LIVE DATA ACTIVE" : "COMMANDS LOCKED";
   }
   if (elements.heroStatus) {
-    const online = !isChecking && !isServerError && systemState.esp32Online;
+    const online = !isChecking && systemState.esp32Online;
     elements.heroStatus.classList.toggle("is-online", online);
-    elements.heroStatus.classList.toggle("is-offline", !online && !isChecking && !isServerError);
-    elements.heroStatus.classList.toggle("is-server-error", isServerError);
+    elements.heroStatus.classList.toggle("is-offline", !online && !isChecking);
+    elements.heroStatus.classList.toggle("is-server-error", false);
   }
   if (elements.connectionBadge) {
-    const online = !isChecking && !isServerError && systemState.esp32Online;
+    const online = !isChecking && systemState.esp32Online;
     elements.connectionBadge.classList.toggle("is-online", online);
-    elements.connectionBadge.classList.toggle("is-offline", !online && !isChecking && !isServerError);
+    elements.connectionBadge.classList.toggle("is-offline", !online && !isChecking);
   }
 
   const statuses = [
@@ -102,17 +103,15 @@ function renderSystemState() {
     elements.pumpState.textContent = pumpLabel;
     elements.pumpState.classList.toggle("state-off", systemState.pumpState !== false);
   }
-  if (elements.pumpButton) elements.pumpButton.disabled = isChecking || isServerError || !systemState.esp32Online;
-  if (elements.pumpButton) elements.pumpButton.textContent = isChecking ? "CHECKING..." : isServerError ? "SERVER OFFLINE" : systemState.esp32Online ? "PUMP CONTROL" : "PUMP CONTROL UNAVAILABLE";
+  if (elements.pumpButton) elements.pumpButton.disabled = isChecking || !systemState.esp32Online;
+  if (elements.pumpButton) elements.pumpButton.textContent = isChecking ? "CHECKING..." : systemState.esp32Online ? "PUMP CONTROL" : "PUMP CONTROL UNAVAILABLE";
   if (elements.commandMessage) {
     elements.commandMessage.textContent = isChecking
       ? "Checking the real Blynk ESP32 connection status..."
-      : isServerError
-        ? "Backend unavailable. Server offline / connection error."
-        : systemState.esp32Online
-          ? "ESP32 is online. Commands can be sent when the secure backend allows it."
-          : "ESP32 is offline. Pump controls are disabled.";
-    elements.commandMessage.style.color = isChecking ? "#76dff2" : isServerError ? "#f28f8c" : systemState.esp32Online ? "#73e0ac" : "#e8c078";
+      : systemState.esp32Online
+        ? "ESP32 is online. Direct Blynk control is available."
+        : "ESP32 is offline. Pump controls are disabled.";
+    elements.commandMessage.style.color = isChecking ? "#76dff2" : systemState.esp32Online ? "#73e0ac" : "#e8c078";
   }
   if (elements.requirement) elements.requirement.textContent = systemState.irrigationRequirement || "UNAVAILABLE";
   if (elements.requirementCopy) elements.requirementCopy.textContent = systemState.irrigationRequirement || "UNAVAILABLE";
@@ -120,11 +119,26 @@ function renderSystemState() {
 }
 
 async function getSystemStatus() {
-  const response = await fetch(`${API_BASE_URL}/esp32-status`, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("Unable to reach Blynk status endpoint.");
+  if (!BLYNK_AUTH_TOKEN) {
+    throw new Error("Blynk auth token is not configured for direct client access.");
   }
-  return response.json();
+
+  const response = await fetch(`${BLYNK_API_BASE}/isHardwareConnected?token=${encodeURIComponent(BLYNK_AUTH_TOKEN)}`, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Unable to reach Blynk hardware status endpoint.");
+  }
+
+  const text = await response.text();
+  const normalized = String(text).trim();
+  const online = normalized === "1" || normalized === "true" || normalized.toLowerCase() === "online";
+
+  return {
+    online,
+    wifiConnected: online,
+    cloudConnected: online,
+    sensorsActive: online,
+    deviceState: normalized,
+  };
 }
 
 async function getSensorData() { return null; }
@@ -167,7 +181,7 @@ async function refreshHardwareStatus() {
     systemState.pumpState = null;
     systemState.irrigationRequirement = null;
     systemState.moistureTrend = null;
-    systemState.statusState = "SERVER OFFLINE / CONNECTION ERROR";
+    systemState.statusState = "OFFLINE";
     renderSystemState();
   }
 }
