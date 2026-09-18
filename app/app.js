@@ -15,6 +15,7 @@ const systemState = {
   irrigationRequirement: null,
   season: "SUMMER",
   cropProfile: "GENERAL CROPS",
+  statusState: "CHECKING",
 };
 
 const elements = {
@@ -49,20 +50,32 @@ function renderSystemState() {
   setText("[data-status=temperature]", systemState.temperature === null ? "DATA UNAVAILABLE" : "SENSOR OK");
   setText("[data-status=humidity]", systemState.humidity === null ? "DATA UNAVAILABLE" : "SENSOR OK");
 
-  const esp32Label = systemState.esp32Online ? "ONLINE" : "OFFLINE";
-  const wifiLabel = systemState.wifiConnected ? "CONNECTED" : "UNAVAILABLE";
-  const cloudLabel = systemState.cloudConnected ? "CONNECTED" : "UNAVAILABLE";
-  const sensorLabel = systemState.sensorsActive ? "ACTIVE" : "DATA UNAVAILABLE";
-  const pumpLabel = systemState.pumpState === null ? "OFFLINE" : systemState.pumpState ? "ON" : "OFF";
+  const isChecking = systemState.statusState === "CHECKING";
+  const isServerError = systemState.statusState === "SERVER OFFLINE / CONNECTION ERROR";
+  const esp32Label = isChecking ? "CHECKING" : systemState.esp32Online ? "ONLINE" : "OFFLINE";
+  const wifiLabel = isChecking ? "CHECKING" : systemState.wifiConnected ? "CONNECTED" : "UNAVAILABLE";
+  const cloudLabel = isChecking ? "CHECKING" : systemState.cloudConnected ? "CONNECTED" : "UNAVAILABLE";
+  const sensorLabel = isChecking ? "CHECKING" : systemState.sensorsActive ? "ACTIVE" : "DATA UNAVAILABLE";
+  const pumpLabel = isChecking ? "CHECKING" : systemState.pumpState === null ? "OFFLINE" : systemState.pumpState ? "ON" : "OFF";
 
-  if (elements.connectionLabel) elements.connectionLabel.textContent = `ESP32 ${esp32Label}`;
-  if (elements.heroStatusText) elements.heroStatusText.textContent = `ESP32 ${esp32Label}`;
-  if (elements.heroStatusMeta) elements.heroStatusMeta.textContent = systemState.esp32Online ? "LIVE DATA ACTIVE" : "COMMANDS LOCKED";
-  if (elements.heroStatus) elements.heroStatus.classList.toggle("is-online", systemState.esp32Online);
-  if (elements.heroStatus) elements.heroStatus.classList.toggle("is-offline", !systemState.esp32Online);
+  if (elements.connectionLabel) {
+    elements.connectionLabel.textContent = isChecking ? "CHECKING..." : isServerError ? "SERVER OFFLINE / CONNECTION ERROR" : `ESP32 ${esp32Label}`;
+  }
+  if (elements.heroStatusText) {
+    elements.heroStatusText.textContent = isChecking ? "ESP32 CHECKING" : isServerError ? "SERVER OFFLINE" : `ESP32 ${esp32Label}`;
+  }
+  if (elements.heroStatusMeta) {
+    elements.heroStatusMeta.textContent = isChecking ? "CHECKING..." : isServerError ? "CONNECTION ERROR" : systemState.esp32Online ? "LIVE DATA ACTIVE" : "COMMANDS LOCKED";
+  }
+  if (elements.heroStatus) {
+    const online = !isChecking && !isServerError && systemState.esp32Online;
+    elements.heroStatus.classList.toggle("is-online", online);
+    elements.heroStatus.classList.toggle("is-offline", !online && !isChecking);
+  }
   if (elements.connectionBadge) {
-    elements.connectionBadge.classList.toggle("is-online", systemState.esp32Online);
-    elements.connectionBadge.classList.toggle("is-offline", !systemState.esp32Online);
+    const online = !isChecking && !isServerError && systemState.esp32Online;
+    elements.connectionBadge.classList.toggle("is-online", online);
+    elements.connectionBadge.classList.toggle("is-offline", !online && !isChecking);
   }
 
   const statuses = [
@@ -88,13 +101,17 @@ function renderSystemState() {
     elements.pumpState.textContent = pumpLabel;
     elements.pumpState.classList.toggle("state-off", systemState.pumpState !== false);
   }
-  if (elements.pumpButton) elements.pumpButton.disabled = !systemState.esp32Online;
-  if (elements.pumpButton) elements.pumpButton.textContent = systemState.esp32Online ? "PUMP CONTROL" : "PUMP CONTROL UNAVAILABLE";
+  if (elements.pumpButton) elements.pumpButton.disabled = isChecking || isServerError || !systemState.esp32Online;
+  if (elements.pumpButton) elements.pumpButton.textContent = isChecking ? "CHECKING..." : isServerError ? "SERVER OFFLINE" : systemState.esp32Online ? "PUMP CONTROL" : "PUMP CONTROL UNAVAILABLE";
   if (elements.commandMessage) {
-    elements.commandMessage.textContent = systemState.esp32Online
-      ? "ESP32 is online. Commands can be sent when the secure backend allows it."
-      : "ESP32 is offline. Pump controls are disabled.";
-    elements.commandMessage.style.color = systemState.esp32Online ? "#73e0ac" : "#e8c078";
+    elements.commandMessage.textContent = isChecking
+      ? "Checking the real Blynk ESP32 connection status..."
+      : isServerError
+        ? "Backend unavailable. Server offline / connection error."
+        : systemState.esp32Online
+          ? "ESP32 is online. Commands can be sent when the secure backend allows it."
+          : "ESP32 is offline. Pump controls are disabled.";
+    elements.commandMessage.style.color = isChecking ? "#76dff2" : isServerError ? "#f28f8c" : systemState.esp32Online ? "#73e0ac" : "#e8c078";
   }
   if (elements.requirement) elements.requirement.textContent = systemState.irrigationRequirement || "UNAVAILABLE";
   if (elements.requirementCopy) elements.requirementCopy.textContent = systemState.irrigationRequirement || "UNAVAILABLE";
@@ -122,6 +139,9 @@ async function setPumpState(nextState) {
 async function setIrrigationMode(mode) { systemState.irrigationMode = mode; renderSystemState(); return mode; }
 
 async function refreshHardwareStatus() {
+  systemState.statusState = "CHECKING";
+  renderSystemState();
+
   try {
     const status = await getSystemStatus();
     const connected = Boolean(status && status.online);
@@ -129,6 +149,7 @@ async function refreshHardwareStatus() {
     systemState.wifiConnected = connected || Boolean(status && status.wifiConnected);
     systemState.cloudConnected = connected || Boolean(status && status.cloudConnected);
     systemState.sensorsActive = connected && Boolean(status && status.sensorsActive);
+    systemState.statusState = connected ? "ONLINE" : "OFFLINE";
     if (status && typeof status.pumpState !== "undefined") systemState.pumpState = Boolean(status.pumpState);
     if (status && typeof status.soilMoisture !== "undefined") systemState.soilMoisture = status.soilMoisture;
     if (status && typeof status.temperature !== "undefined") systemState.temperature = status.temperature;
@@ -145,6 +166,7 @@ async function refreshHardwareStatus() {
     systemState.pumpState = null;
     systemState.irrigationRequirement = null;
     systemState.moistureTrend = null;
+    systemState.statusState = "SERVER OFFLINE / CONNECTION ERROR";
     renderSystemState();
   }
 }

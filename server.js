@@ -117,14 +117,16 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/' || pathname === '/index.html') {
     targetPath = path.join(appDir, 'index.html');
-  } else if (pathname.startsWith('/app')) {
-    targetPath = path.join(appRoot, pathname.replace(/^\/+/, ''));
-    if (!targetPath.startsWith(appRoot)) {
+  } else if (pathname === '/app.js' || pathname === '/style.css') {
+    targetPath = path.join(appDir, pathname.replace(/^\//, ''));
+  } else if (pathname.startsWith('/app/')) {
+    targetPath = path.join(appDir, pathname.slice('/app/'.length));
+    if (!targetPath.startsWith(appDir)) {
       targetPath = path.join(appDir, 'index.html');
     }
   } else if (pathname.startsWith('/')) {
-    targetPath = path.join(appRoot, pathname.replace(/^\/+/, ''));
-    if (!targetPath.startsWith(appRoot)) {
+    targetPath = path.join(appDir, pathname.replace(/^\/+/, ''));
+    if (!targetPath.startsWith(appDir)) {
       targetPath = path.join(appDir, 'index.html');
     }
   }
