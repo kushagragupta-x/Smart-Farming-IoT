@@ -25,7 +25,7 @@
 
       * { box-sizing: border-box; }
 
-      html { scroll-behavior: smooth; }
+      html { scroll-behavior: auto; }
 
       body {
         margin: 0;
@@ -1669,7 +1669,7 @@
         position: absolute;
         left: 50%;
         transform: translate3d(-50%, var(--lift, 0px), var(--depth, 0px)) rotateX(var(--tilt, 0deg));
-        transition: transform 0.08s linear, opacity 0.08s linear;
+        transition: none;
         will-change: transform, opacity;
       }
 
@@ -1742,6 +1742,7 @@
       .component-climate { top: 174px; left: 84%; }
       .component-relay { top: 365px; left: 12%; }
       .component-pump { top: 492px; left: 50%; }
+      .component-oled { top: 92px; left: 82%; }
 
       .exploded-labels {
         align-self: stretch;
@@ -2117,9 +2118,221 @@
 
       .code-path b { color: var(--cyan); }
 
+      .briefing-grid,
+      .diagnostics-grid,
+      .future-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 18px;
+      }
+
+      .briefing-panel,
+      .diagnostic-panel,
+      .future-panel {
+        padding: 24px;
+        border: 1px solid rgba(120, 239, 255, 0.14);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(14, 31, 31, 0.88), rgba(7, 16, 18, 0.9));
+      }
+
+      .briefing-panel h3,
+      .diagnostic-panel h3,
+      .future-panel h3 {
+        margin: 0 0 8px;
+        font-size: 0.82rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .briefing-panel > p,
+      .diagnostic-panel > p,
+      .future-panel > p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .adaptive-equation {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin: 18px 0;
+      }
+
+      .adaptive-input,
+      .adaptive-output {
+        min-height: 54px;
+        display: grid;
+        place-items: center;
+        padding: 9px;
+        border: 1px solid rgba(104, 230, 255, 0.18);
+        border-radius: 9px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+      }
+
+      .adaptive-input { background: rgba(11, 35, 34, 0.7); }
+      .adaptive-output { border-color: rgba(126, 240, 176, 0.38); color: var(--green); background: rgba(20, 61, 48, 0.52); }
+
+      .adaptive-arrow {
+        grid-column: 1 / -1;
+        color: var(--cyan);
+        text-align: center;
+        font-size: 1.1rem;
+      }
+
+      .profile-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .profile-item {
+        padding: 12px 8px;
+        border-top: 1px solid rgba(104, 230, 255, 0.24);
+        color: var(--muted);
+        text-align: center;
+        font-size: 0.64rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+      }
+
+      .profile-item:first-child { color: var(--green); border-color: var(--green); }
+
+      .trend-chart {
+        position: relative;
+        height: 140px;
+        margin: 18px 0 10px;
+        overflow: hidden;
+        border: 1px solid rgba(104, 230, 255, 0.14);
+        border-radius: 12px;
+        background: repeating-linear-gradient(0deg, transparent 0 34px, rgba(104, 230, 255, 0.07) 35px), repeating-linear-gradient(90deg, transparent 0 48px, rgba(104, 230, 255, 0.05) 49px);
+      }
+
+      .trend-chart::before {
+        content: "";
+        position: absolute;
+        inset: 20px 10px;
+        background: linear-gradient(145deg, transparent 0 12%, var(--cyan) 12.5% 13.5%, transparent 14% 28%, var(--green) 28.5% 29.5%, transparent 30% 45%, var(--cyan) 45.5% 46.5%, transparent 47% 64%, var(--green) 64.5% 65.5%, transparent 66% 80%, var(--cyan) 80.5% 81.5%, transparent 82%);
+        clip-path: polygon(0 74%, 12% 68%, 24% 72%, 37% 51%, 48% 59%, 62% 38%, 74% 44%, 86% 24%, 100% 30%, 100% 33%, 86% 27%, 74% 47%, 62% 41%, 48% 62%, 37% 54%, 24% 75%, 12% 71%, 0 77%);
+        filter: drop-shadow(0 0 6px rgba(104, 230, 255, 0.7));
+        animation: tracePulse 3.2s ease-in-out infinite alternate;
+      }
+
+      @keyframes tracePulse { from { opacity: 0.58; transform: translateX(-4px); } to { opacity: 1; transform: translateX(4px); } }
+
+      .trend-key {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .safety-flow,
+      .future-path {
+        display: grid;
+        gap: 8px;
+      }
+
+      .safety-node,
+      .future-node {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 44px;
+        padding: 10px 13px;
+        border-left: 2px solid var(--cyan);
+        background: rgba(10, 29, 30, 0.72);
+        color: var(--muted);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+      }
+
+      .safety-node strong,
+      .future-node strong { color: var(--green); }
+      .safety-arrow,
+      .future-arrow { color: var(--cyan); text-align: center; }
+
+      .status-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        border: 1px solid rgba(120, 239, 255, 0.13);
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 0.67rem;
+        letter-spacing: 0.08em;
+      }
+
+      .status-item em { color: var(--green); font-style: normal; font-weight: 800; }
+      .status-item .planned { color: var(--cyan); }
+
+      .honesty-note {
+        margin-top: 16px;
+        color: rgba(158, 203, 192, 0.72);
+        font-size: 0.75rem;
+        line-height: 1.7;
+      }
+
+      .visual-shield::before,
+      .visual-breadboard::before,
+      .visual-wires::before { content: ""; position: absolute; }
+
+      .visual-shield::before {
+        inset: 20px 32px;
+        border: 2px solid #6ddab5;
+        border-radius: 7px;
+        background: repeating-linear-gradient(90deg, transparent 0 16px, rgba(104, 230, 255, 0.24) 17px 19px), #123c32;
+        box-shadow: 0 0 18px rgba(104, 230, 255, 0.14);
+      }
+
+      .visual-breadboard::before {
+        inset: 27px 25px;
+        border: 2px solid #a5d9ce;
+        border-radius: 5px;
+        background: radial-gradient(circle, var(--cyan) 0 2px, transparent 2.5px) 7px 7px / 16px 16px, #1a332f;
+      }
+
+      .visual-wires::before {
+        inset: 24px 30px;
+        border-bottom: 3px solid var(--cyan);
+        border-radius: 0 0 50% 50%;
+        box-shadow: 0 13px 0 -1px var(--green), 35px -18px 0 -1px var(--cyan);
+        transform: rotate(-11deg);
+      }
+
+      .farm-brief {
+        margin-top: 22px;
+        padding: 22px 24px;
+        border: 1px solid rgba(126, 240, 176, 0.2);
+        border-radius: 18px;
+        background: rgba(10, 29, 26, 0.7);
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .farm-brief strong { display: block; margin-bottom: 8px; color: var(--green); letter-spacing: 0.14em; text-transform: uppercase; }
+
       @media (max-width: 980px) {
         .component-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .architecture-grid { grid-template-columns: 1fr; }
+        .architecture-grid,
+        .briefing-grid,
+        .diagnostics-grid,
+        .future-grid { grid-template-columns: 1fr; }
       }
 
       @media (max-width: 700px) {
@@ -2128,6 +2341,9 @@
         .stack-grid { grid-template-columns: 1fr; }
         .architecture-flow { grid-template-columns: 1fr; }
         .architecture-arrow { transform: rotate(90deg); justify-self: center; }
+        .adaptive-equation { grid-template-columns: repeat(2, 1fr); }
+        .profile-row,
+        .status-list { grid-template-columns: 1fr; }
       }
 
       @media (max-width: 800px) {
@@ -2146,6 +2362,7 @@
         .component-climate { left: 85%; top: 150px; }
         .component-relay { left: 10%; top: 315px; }
         .component-pump { top: 410px; }
+        .component-oled { left: 82%; top: 84px; }
         .exploded-labels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .exploded-labels .label-intro { grid-column: 1 / -1; }
         .exploded-label { min-height: 38px; }
@@ -2175,7 +2392,7 @@
             </h1>
             <div class="team-line">TEAM PROTOTYPE • IX-F</div>
             <div class="hero-cta">
-              <button class="button primary" type="button" data-scroll-target="#exploded-system">Explore the system</button>
+              <a class="button primary" href="#exploded-system">Explore the system</a>
               <a class="button" href="#monitoring">Monitoring</a>
             </div>
           </div>
@@ -2194,12 +2411,12 @@
 
               <div class="control-board">
                 <div class="mini-card">
-                  <h4>Water Flow</h4>
-                  <div class="metric"><strong>68%</strong><span>FLOW</span></div>
+                  <h4>Water Path</h4>
+                  <div class="metric"><strong>PIPE</strong><span>PATH</span></div>
                 </div>
                 <div class="mini-card">
-                  <h4>Farm Mode</h4>
-                  <div class="metric"><strong>AUTO</strong><span>MODE</span></div>
+                  <h4>Decision Layer</h4>
+                  <div class="metric"><strong>ADAPT</strong><span>CONCEPT</span></div>
                 </div>
               </div>
 
@@ -2355,7 +2572,7 @@
             <div class="component-grid reveal">
               <article class="component-card">
                 <div class="component-visual visual-board" aria-label="Technical illustration of an ESP32 development board"></div>
-                <h3>ESP32</h3>
+                <h3>ESP32 NodeMCU 30-pin</h3>
                 <p><strong>Purpose</strong> Central microcontroller for the system.</p>
                 <p><strong>Role in system</strong> Processes sensor data, communicates over Wi-Fi and coordinates irrigation logic.</p>
               </article>
@@ -2394,6 +2611,24 @@
                 <h3>Transparent Flexible Pipe</h3>
                 <p><strong>Purpose</strong> Carries irrigation water through the structure.</p>
                 <p><strong>Role in system</strong> Distributes water across the multi-layer cultivation levels.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-shield" aria-label="Technical illustration of an ESP32 expansion shield"></div>
+                <h3>ESP32 Expansion Shield</h3>
+                <p><strong>Purpose</strong> Simplifies access to the ESP32 connections.</p>
+                <p><strong>Role in system</strong> Supports cleaner prototyping connections between the controller and peripherals.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-breadboard" aria-label="Technical illustration of a breadboard"></div>
+                <h3>Breadboard</h3>
+                <p><strong>Purpose</strong> Temporary platform for circuit connections.</p>
+                <p><strong>Role in system</strong> Holds prototype connections during development without permanent soldering.</p>
+              </article>
+              <article class="component-card">
+                <div class="component-visual visual-wires" aria-label="Technical illustration of jumper wires"></div>
+                <h3>Jumper Wires</h3>
+                <p><strong>Purpose</strong> Electrical connections between components.</p>
+                <p><strong>Role in system</strong> Connects the sensors, display, relay and controller during prototyping.</p>
               </article>
             </div>
           </div>
@@ -2470,6 +2705,127 @@
           </div>
         </section>
 
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Decision Layer / Concept</div>
+              <h2>AI-Assisted Adaptive Irrigation</h2>
+            </div>
+            <div class="briefing-grid reveal">
+              <div class="briefing-panel">
+                <h3>Adaptive decision engine</h3>
+                <p>This is a planned software decision layer, not a claim that the prototype runs machine learning. It combines available readings and selected profiles instead of relying only on one fixed threshold.</p>
+                <div class="adaptive-equation">
+                  <div class="adaptive-input">SOIL MOISTURE</div>
+                  <div class="adaptive-input">TEMPERATURE</div>
+                  <div class="adaptive-input">HUMIDITY</div>
+                  <div class="adaptive-input">MOISTURE TREND</div>
+                  <div class="adaptive-input">RECENT IRRIGATION</div>
+                  <div class="adaptive-input">SEASON / CROP PROFILE</div>
+                  <div class="adaptive-arrow">↓</div>
+                  <div class="adaptive-output">ADAPTIVE DECISION ENGINE<br />IRRIGATION REQUIREMENT</div>
+                  <div class="adaptive-arrow">↓</div>
+                  <div class="adaptive-output">ESP32 CONTROL LOGIC → RELAY → PUMP</div>
+                </div>
+                <p class="honesty-note">A rapidly falling moisture trend or higher temperature may increase the recommendation. Rising moisture, higher humidity or a recent irrigation event may reduce the immediate requirement.</p>
+              </div>
+              <div class="briefing-panel">
+                <h3>Software profiles</h3>
+                <p>These are selectable profiles for the future Project App. They apply to the monitored farm as a whole because the physical project has one soil moisture sensor.</p>
+                <div class="profile-row"><div class="profile-item">SUMMER<br /><small>drying tendency may rise sooner</small></div><div class="profile-item">WINTER<br /><small>requirement may be delayed</small></div><div class="profile-item">CUSTOM<br /><small>planned profile</small></div></div>
+                <div class="profile-row"><div class="profile-item">GENERAL CROPS</div><div class="profile-item">LEAFY PLANTS</div><div class="profile-item">VEGETABLES</div></div>
+                <p class="honesty-note">Season modes are software irrigation profiles, not weather forecasts. Crop profiles do not create independent sensing or watering for individual layers.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Control Logic / Planned</div>
+              <h2>Safety, Trend &amp; Irrigation History</h2>
+            </div>
+            <div class="briefing-grid reveal">
+              <div class="briefing-panel">
+                <h3>Moisture trend</h3>
+                <p>Recent sensor readings can be compared to derive a simple trend: rising, falling or stable. The trend becomes an additional input to the adaptive irrigation recommendation.</p>
+                <div class="trend-chart" aria-label="Illustrative moisture trend graph"></div>
+                <div class="trend-key"><span>RISING</span><span>FALLING</span><span>STABLE</span></div>
+              </div>
+              <div class="briefing-panel">
+                <h3>Pump safety timeout</h3>
+                <p>A future control implementation can use a maximum runtime so that a missed condition cannot leave the pump running continuously.</p>
+                <div class="safety-flow">
+                  <div class="safety-node">PUMP ON <strong>→ TIMER START</strong></div>
+                  <div class="safety-arrow">↓</div>
+                  <div class="safety-node">MOISTURE CONDITION CHECK <strong>→ PUMP OFF</strong></div>
+                  <div class="safety-arrow">OR</div>
+                  <div class="safety-node">MAXIMUM RUNTIME REACHED <strong>→ PUMP OFF</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="briefing-panel reveal" style="margin-top: 18px;">
+              <h3>Illustrative irrigation history</h3>
+              <p>Example system log format for the future Project App. These records are not readings from the physical prototype.</p>
+              <div class="status-list"><div class="status-item"><span>Pump event</span><em>ILLUSTRATIVE</em></div><div class="status-item"><span>Duration</span><em>EXAMPLE</em></div><div class="status-item"><span>Time</span><em>EXAMPLE</em></div><div class="status-item"><span>Event state</span><em>PUMP OFF</em></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Reliability / Planned</div>
+              <h2>Diagnostics &amp; Connection Monitoring</h2>
+            </div>
+            <div class="diagnostics-grid reveal">
+              <div class="diagnostic-panel">
+                <h3>Sensor sanity checking</h3>
+                <p>Software-side checks can identify missing, unusual or implausible readings. This is a warning layer, not perfect hardware fault diagnosis.</p>
+                <div class="status-list"><div class="status-item"><span>Normal reading</span><em>SENSOR OK</em></div><div class="status-item"><span>Unexpected value</span><em>CHECK SENSOR</em></div><div class="status-item"><span>No recent value</span><em class="planned">DATA UNAVAILABLE</em></div></div>
+              </div>
+              <div class="diagnostic-panel">
+                <h3>Future Project App status view</h3>
+                <p>These statuses describe the monitoring interface planned for the separate app. Project Info is not receiving live hardware data.</p>
+                <div class="status-list"><div class="status-item"><span>ESP32</span><em class="planned">ONLINE</em></div><div class="status-item"><span>Wi-Fi</span><em class="planned">CONNECTED</em></div><div class="status-item"><span>Soil Sensor</span><em class="planned">ACTIVE</em></div><div class="status-item"><span>DHT11</span><em class="planned">ACTIVE</em></div><div class="status-item"><span>Pump</span><em>OFF</em></div><div class="status-item"><span>Cloud</span><em class="planned">CONNECTED</em></div></div>
+              </div>
+            </div>
+            <div class="farm-brief reveal"><strong>Offline behaviour</strong>If the ESP32 is offline, the future Project App should display OFFLINE, disable hardware controls and send no pump commands. Hardware availability must be communicated clearly to the operator.</div>
+          </div>
+        </section>
+
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Objective</div>
+              <h2>Reduce Unnecessary Water Use</h2>
+            </div>
+            <div class="farm-brief reveal"><strong>Rainwater reuse + soil monitoring + adaptive irrigation + controlled pumping + multi-layer farming</strong>The project combines collected rainwater, one soil-moisture input, environmental readings and controlled pump operation to support more deliberate irrigation. No measured percentage of water savings is claimed without an experiment.</div>
+          </div>
+        </section>
+
+        <section class="section technical-section">
+          <div class="container">
+            <div class="section-header reveal">
+              <div class="eyebrow">Boundary / Future Work</div>
+              <h2>Project Info vs Project App</h2>
+            </div>
+            <div class="future-grid reveal">
+              <div class="future-panel">
+                <h3>PROJECT INFO</h3>
+                <p>Explanation, architecture, hardware, adaptive-logic concept, technical animations and team presentation. It sends no physical commands.</p>
+                <div class="status-list"><div class="status-item"><span>Purpose</span><em>EXPLAIN</em></div><div class="status-item"><span>Hardware control</span><em>NONE</em></div><div class="status-item"><span>Readings</span><em>ILLUSTRATIVE</em></div></div>
+              </div>
+              <div class="future-panel">
+                <h3>PROJECT APP / PLANNED</h3>
+                <p>The separate future interface is intended for live monitoring, settings, history, diagnostics and physical control. It is not being built here.</p>
+                <div class="future-path"><div class="future-node">JUDGE PHONE <strong>→</strong></div><div class="future-arrow">↓</div><div class="future-node">PROJECT APP <strong>→</strong></div><div class="future-arrow">↓</div><div class="future-node">SECURE BACKEND / API <strong>→</strong></div><div class="future-arrow">↓</div><div class="future-node">BLYNK CLOUD → ESP32 → RELAY → PUMP</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="section">
           <div class="container">
             <div class="section-header reveal">
@@ -2481,12 +2837,12 @@
               <div class="control-box">
                 <div class="pump-status">
                   <div class="pump-box">
-                    <small>Water Pump</small>
-                    <strong class="off">OFF</strong>
+                    <small>Actuation Path</small>
+                    <strong>RELAY → PUMP</strong>
                   </div>
                   <div class="pump-box">
-                    <small>Mode</small>
-                    <strong>AUTO</strong>
+                    <small>Logic Scope</small>
+                    <strong>CONCEPT</strong>
                   </div>
                 </div>
 
@@ -2547,6 +2903,7 @@
                 <strong>Multi-Layer<br />Farm</strong>
               </div>
             </div>
+            <div class="farm-brief reveal"><strong>Complete water and sensing chain</strong>RAINWATER HARVESTING → WATER STORAGE → PUMP → TRANSPARENT PIPE → MULTI-LAYER FARM → SOIL MOISTURE MONITORING → ESP32 PROCESSING → IRRIGATION DECISION</div>
           </div>
         </section>
 
@@ -2562,30 +2919,33 @@
                 <div class="exploded-viewport" aria-label="Scroll-driven exploded view of the farming system">
                   <div class="exploded-stack">
                     <div class="exploded-pipe" data-exploded-part="pipe" aria-hidden="true"></div>
-                    <div class="exploded-component component-storage" data-exploded-part="storage">WATER STORAGE<br /><small>rainwater reuse</small></div>
+                    <div class="exploded-component component-storage" data-exploded-part="storage">RAINWATER STORAGE<br /><small>reuse concept</small></div>
                     <div class="exploded-component component-sensor" data-exploded-part="sensor">SOIL SENSOR<br /><small>moisture reading</small></div>
                     <div class="exploded-component component-controller" data-exploded-part="controller">ESP32 CONTROLLER<br /><small>signal processing</small></div>
                     <div class="exploded-component component-climate" data-exploded-part="climate">TEMPERATURE &amp; HUMIDITY<br /><small>DHT11 sensor</small></div>
                     <div class="exploded-component component-relay" data-exploded-part="relay">RELAY MODULE<br /><small>switching interface</small></div>
                     <div class="exploded-component component-pump" data-exploded-part="pump">WATER PUMP<br /><small>irrigation supply</small></div>
-                    <div class="exploded-layer" style="--top: 118px; --width: 88%;" data-exploded-part="layer-3"><span class="leaf">L3</span><span>LAYER 3</span></div>
-                    <div class="exploded-layer" style="--top: 222px; --width: 75%;" data-exploded-part="layer-2"><span class="leaf">L2</span><span>LAYER 2</span></div>
-                    <div class="exploded-layer" style="--top: 326px; --width: 62%;" data-exploded-part="layer-1"><span class="leaf">L1</span><span>LAYER 1</span></div>
+                    <div class="exploded-component component-oled" data-exploded-part="oled">OLED DISPLAY<br /><small>local status view</small></div>
+                    <div class="exploded-layer" style="--top: 118px; --width: 88%;" data-exploded-part="layer-3"><span class="leaf">L3</span><span>LAYER 03</span></div>
+                    <div class="exploded-layer" style="--top: 222px; --width: 75%;" data-exploded-part="layer-2"><span class="leaf">L2</span><span>LAYER 02</span></div>
+                    <div class="exploded-layer" style="--top: 326px; --width: 62%;" data-exploded-part="layer-1"><span class="leaf">L1</span><span>LAYER 01</span></div>
                   </div>
                 </div>
 
                 <div class="exploded-labels">
                   <p class="label-intro">A scroll-controlled look beneath the structure. Every subsystem remains aligned as it moves into view.</p>
-                  <div class="exploded-label" data-label-for="layer-3">LAYER 3</div>
-                  <div class="exploded-label" data-label-for="layer-2">LAYER 2</div>
-                  <div class="exploded-label" data-label-for="layer-1">LAYER 1</div>
+                  <div class="exploded-label" data-label-for="layer-3">LAYER 03</div>
+                  <div class="exploded-label" data-label-for="layer-2">LAYER 02</div>
+                  <div class="exploded-label" data-label-for="layer-1">LAYER 01</div>
                   <div class="exploded-label" data-label-for="pipe">WATER DISTRIBUTION</div>
-                  <div class="exploded-label" data-label-for="storage">WATER STORAGE</div>
+                  <div class="exploded-label" data-label-for="storage">RAINWATER STORAGE</div>
+                  <div class="exploded-label" data-label-for="pipe">TRANSPARENT WATER PIPE</div>
                   <div class="exploded-label" data-label-for="sensor">SOIL MOISTURE SENSOR</div>
                   <div class="exploded-label" data-label-for="climate">TEMPERATURE &amp; HUMIDITY SENSOR</div>
                   <div class="exploded-label" data-label-for="controller">ESP32 CONTROLLER</div>
                   <div class="exploded-label" data-label-for="relay">RELAY MODULE</div>
                   <div class="exploded-label" data-label-for="pump">WATER PUMP</div>
+                  <div class="exploded-label" data-label-for="oled">OLED DISPLAY</div>
                 </div>
               </div>
             </div>
@@ -2914,10 +3274,7 @@
 
         const parts = [...stage.querySelectorAll('[data-exploded-part]')];
         const labels = [...stage.querySelectorAll('[data-label-for]')];
-        let frame = 0;
-
         const update = () => {
-          frame = 0;
           const bounds = stage.getBoundingClientRect();
           const travel = Math.max(stage.offsetHeight - window.innerHeight, 1);
           const progress = Math.max(0, Math.min(1, -bounds.top / travel));
@@ -2931,7 +3288,8 @@
             climate: -78 * progress,
             controller: 118 * progress,
             relay: 145 * progress,
-            pump: 185 * progress
+                    pump: 185 * progress,
+                    oled: -128 * progress
           };
 
           parts.forEach((part) => {
@@ -2949,7 +3307,8 @@
               sensor: 0.52,
               controller: 0.66,
               relay: 0.76,
-              pump: 0.84
+              pump: 0.84,
+              oled: 0.7
             }[name] || 0;
             const opacity = progress < revealStart ? 0.35 : 1;
             part.style.setProperty('--lift', `${lift}px`);
@@ -2974,22 +3333,9 @@
           });
         };
 
-        const requestUpdate = () => {
-          if (!frame) frame = requestAnimationFrame(update);
-        };
-
-        window.addEventListener('scroll', requestUpdate, { passive: true });
-        window.addEventListener('resize', requestUpdate);
-        requestUpdate();
-      }
-
-      function initScrollLinks() {
-        document.querySelectorAll('[data-scroll-target]').forEach((link) => {
-          link.addEventListener('click', () => {
-            const target = document.querySelector(link.dataset.scrollTarget);
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          });
-        });
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update);
+        update();
       }
 
       createParticles();
@@ -2997,7 +3343,6 @@
       initReveal();
       initCounterReveal();
       initExplodedView();
-      initScrollLinks();
     </script>
   </body>
 </html>
