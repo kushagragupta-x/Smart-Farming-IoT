@@ -39,9 +39,9 @@
         <section class="section" aria-labelledby="dashboard-title">
           <div class="section-heading"><div><span class="section-code">01 / OVERVIEW</span><h2 id="dashboard-title">System dashboard</h2></div><span class="read-only">LOCAL STATE</span></div>
           <div class="sensor-grid">
-            <article class="metric-card metric-primary"><span class="card-label">SOIL MOISTURE</span><strong data-value="soilMoisture">--</strong><span class="metric-unit">%</span><small data-status="soilMoisture">DATA UNAVAILABLE</small><em>TREND UNAVAILABLE</em></article>
-            <article class="metric-card"><span class="card-label">TEMPERATURE</span><strong data-value="temperature">--</strong><span class="metric-unit">°C</span><small data-status="temperature">DATA UNAVAILABLE</small><em>TREND UNAVAILABLE</em></article>
-            <article class="metric-card"><span class="card-label">HUMIDITY</span><strong data-value="humidity">--</strong><span class="metric-unit">%</span><small data-status="humidity">DATA UNAVAILABLE</small><em>TREND UNAVAILABLE</em></article>
+            <article class="metric-card metric-primary"><span class="card-label">SOIL MOISTURE</span><strong data-value="soilMoisture">--</strong><span class="metric-unit">%</span><small data-status="soilMoisture">NO SENSOR DATA</small><em>TREND UNAVAILABLE</em></article>
+            <article class="metric-card"><span class="card-label">TEMPERATURE</span><strong data-value="temperature">--</strong><span class="metric-unit">°C</span><small data-status="temperature">NO SENSOR DATA</small><em>TREND UNAVAILABLE</em></article>
+            <article class="metric-card"><span class="card-label">HUMIDITY</span><strong data-value="humidity">--</strong><span class="metric-unit">%</span><small data-status="humidity">NO SENSOR DATA</small><em>TREND UNAVAILABLE</em></article>
           </div>
           <div class="status-strip" data-status-strip></div>
         </section>
@@ -50,7 +50,7 @@
           <div class="section-heading"><div><span class="section-code">02 / IRRIGATION</span><h2 id="irrigation-title">Irrigation control</h2></div><span class="read-only">BACKEND REQUIRED</span></div>
           <div class="control-layout">
             <article class="control-panel">
-              <div class="panel-topline"><span class="card-label">PUMP STATUS</span><span class="state-pill state-off" data-pump-state>OFFLINE</span></div>
+              <div class="panel-topline"><span class="card-label">PUMP STATUS</span><span class="state-pill state-off" data-pump-state>NOT CONNECTED</span></div>
               <p class="panel-value">No hardware command has been sent.</p>
               <div class="mode-switch" role="group" aria-label="Irrigation mode">
                 <button type="button" class="mode-button is-selected" data-mode="AUTO">AUTOMATIC</button>

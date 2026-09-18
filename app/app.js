@@ -1,17 +1,13 @@
-const BLYNK_TEMPLATE_ID = "TMPL3PRnnCUPe";
 const BLYNK_AUTH_TOKEN = "IMz1W97RnK2l9Y_cGsoBEzPGsKr1jQt-";
 const BLYNK_API_BASE = "https://blynk.cloud/external/api";
 
 const systemState = {
-  connected: false,
   esp32Online: false,
   wifiConnected: false,
   cloudConnected: false,
-  sensorsActive: false,
   soilMoisture: null,
   temperature: null,
   humidity: null,
-  pumpState: null,
   irrigationMode: "AUTO",
   moistureTrend: null,
   irrigationRequirement: null,
@@ -48,17 +44,17 @@ function renderSystemState() {
   };
 
   Object.entries(valueLabels).forEach(([key, value]) => setText(`[data-value="${key}"]`, value));
-  setText("[data-status=soilMoisture]", systemState.soilMoisture === null ? "DATA UNAVAILABLE" : "SENSOR OK");
-  setText("[data-status=temperature]", systemState.temperature === null ? "DATA UNAVAILABLE" : "SENSOR OK");
-  setText("[data-status=humidity]", systemState.humidity === null ? "DATA UNAVAILABLE" : "SENSOR OK");
+  setText("[data-status=soilMoisture]", systemState.soilMoisture === null ? "NO SENSOR DATA" : "SENSOR OK");
+  setText("[data-status=temperature]", systemState.temperature === null ? "NO SENSOR DATA" : "SENSOR OK");
+  setText("[data-status=humidity]", systemState.humidity === null ? "NO SENSOR DATA" : "SENSOR OK");
 
   const isChecking = systemState.statusState === "CHECKING";
   const isConnectionError = systemState.statusState === "CONNECTION ERROR";
   const esp32Label = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.esp32Online ? "ONLINE" : "OFFLINE";
   const wifiLabel = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.wifiConnected ? "CONNECTED" : "UNAVAILABLE";
   const cloudLabel = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.cloudConnected ? "CONNECTED" : "UNAVAILABLE";
-  const sensorLabel = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.sensorsActive ? "ACTIVE" : "DATA UNAVAILABLE";
-  const pumpLabel = isChecking ? "CHECKING" : systemState.pumpState === null ? "OFFLINE" : systemState.pumpState ? "ON" : "OFF";
+  const sensorLabel = isConnectionError ? "ERROR" : "NO SENSOR DATA";
+  const pumpLabel = isConnectionError ? "ERROR" : "NOT CONNECTED";
 
   if (elements.connectionLabel) {
     elements.connectionLabel.textContent = isChecking ? "CHECKING..." : isConnectionError ? "CONNECTION ERROR" : `ESP32 ${esp32Label}`;
@@ -105,18 +101,18 @@ function renderSystemState() {
 
   if (elements.pumpState) {
     elements.pumpState.textContent = pumpLabel;
-    elements.pumpState.classList.toggle("state-off", systemState.pumpState !== false);
+    elements.pumpState.classList.add("state-off");
   }
-  if (elements.pumpButton) elements.pumpButton.disabled = isChecking || isConnectionError || !systemState.esp32Online;
-  if (elements.pumpButton) elements.pumpButton.textContent = isChecking ? "CHECKING..." : isConnectionError ? "CONNECTION ERROR" : systemState.esp32Online ? "PUMP CONTROL" : "PUMP CONTROL UNAVAILABLE";
+  if (elements.pumpButton) elements.pumpButton.disabled = true;
+  if (elements.pumpButton) elements.pumpButton.textContent = isChecking ? "CHECKING..." : isConnectionError ? "CONNECTION ERROR" : "PUMP NOT CONNECTED";
   if (elements.commandMessage) {
     elements.commandMessage.textContent = isChecking
       ? "Checking the real Blynk ESP32 connection status..."
       : isConnectionError
         ? "Blynk request failed. Connection error — not ESP32 offline."
         : systemState.esp32Online
-          ? "ESP32 is online. Direct Blynk control is available."
-          : "ESP32 is offline. Pump controls are disabled.";
+          ? "ESP32 is online. Pump hardware is not connected."
+          : "ESP32 is offline. Pump hardware is not connected.";
     elements.commandMessage.style.color = isChecking ? "#76dff2" : isConnectionError ? "#f28f8c" : systemState.esp32Online ? "#73e0ac" : "#e8c078";
   }
   if (elements.requirement) elements.requirement.textContent = systemState.irrigationRequirement || "UNAVAILABLE";
@@ -142,21 +138,9 @@ async function getSystemStatus() {
     online,
     wifiConnected: online,
     cloudConnected: online,
-    sensorsActive: online,
-    deviceState: normalized,
   };
 }
 
-async function getSensorData() { return null; }
-async function getPumpStatus() { return null; }
-async function setPumpState(nextState) {
-  if (!systemState.esp32Online) {
-    throw new Error("ESP32 is offline. Command not sent.");
-  }
-  systemState.pumpState = nextState;
-  renderSystemState();
-  return nextState;
-}
 async function setIrrigationMode(mode) { systemState.irrigationMode = mode; renderSystemState(); return mode; }
 
 async function refreshHardwareStatus() {
@@ -169,9 +153,7 @@ async function refreshHardwareStatus() {
     systemState.esp32Online = connected;
     systemState.wifiConnected = connected || Boolean(status && status.wifiConnected);
     systemState.cloudConnected = connected || Boolean(status && status.cloudConnected);
-    systemState.sensorsActive = connected && Boolean(status && status.sensorsActive);
     systemState.statusState = connected ? "ONLINE" : "OFFLINE";
-    if (status && typeof status.pumpState !== "undefined") systemState.pumpState = Boolean(status.pumpState);
     if (status && typeof status.soilMoisture !== "undefined") systemState.soilMoisture = status.soilMoisture;
     if (status && typeof status.temperature !== "undefined") systemState.temperature = status.temperature;
     if (status && typeof status.humidity !== "undefined") systemState.humidity = status.humidity;
@@ -180,11 +162,9 @@ async function refreshHardwareStatus() {
     systemState.esp32Online = false;
     systemState.wifiConnected = false;
     systemState.cloudConnected = false;
-    systemState.sensorsActive = false;
     systemState.soilMoisture = null;
     systemState.temperature = null;
     systemState.humidity = null;
-    systemState.pumpState = null;
     systemState.irrigationRequirement = null;
     systemState.moistureTrend = null;
     systemState.statusState = "CONNECTION ERROR";
@@ -215,10 +195,6 @@ function bindControls() {
         systemState[group.dataset.setting === "season" ? "season" : "cropProfile"] = button.dataset.choice;
       });
     });
-  });
-
-  elements.pumpButton?.addEventListener("click", async () => {
-    try { await setPumpState(!systemState.pumpState); } catch (error) { elements.commandMessage.textContent = error.message; }
   });
 
   document.querySelectorAll(".bottom-nav a").forEach((link) => {
