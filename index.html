@@ -2158,6 +2158,15 @@
         margin: 18px 0;
       }
 
+      .adaptive-kicker {
+        margin: 18px 0 8px;
+        color: var(--cyan);
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
       .adaptive-input,
       .adaptive-output {
         min-height: 54px;
@@ -2176,11 +2185,46 @@
       .adaptive-input { background: rgba(11, 35, 34, 0.7); }
       .adaptive-output { border-color: rgba(126, 240, 176, 0.38); color: var(--green); background: rgba(20, 61, 48, 0.52); }
 
+      .adaptive-input strong {
+        display: block;
+        color: var(--text);
+        font-size: 0.62rem;
+        letter-spacing: 0.09em;
+      }
+
+      .adaptive-input small {
+        display: block;
+        margin-top: 5px;
+        color: var(--cyan);
+        font-size: 0.56rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        line-height: 1.35;
+        text-transform: none;
+      }
+
       .adaptive-arrow {
         grid-column: 1 / -1;
         color: var(--cyan);
         text-align: center;
         font-size: 1.1rem;
+      }
+
+      .adaptive-flow {
+        display: grid;
+        width: 100%;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .adaptive-flow .adaptive-arrow {
+        grid-column: auto;
+        width: 100%;
+      }
+
+      .adaptive-flow .adaptive-output {
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .profile-row {
@@ -2287,6 +2331,71 @@
         line-height: 1.7;
       }
 
+      .adaptive-points {
+        display: grid;
+        gap: 8px;
+        margin: 16px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .adaptive-points li {
+        position: relative;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.55;
+      }
+
+      .adaptive-points li::before {
+        content: "+";
+        position: absolute;
+        left: 0;
+        color: var(--green);
+        font-weight: 800;
+      }
+
+      .profile-heading {
+        margin: 18px 0 0;
+        color: var(--cyan);
+        font-size: 0.64rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .adaptive-followup { margin-top: 18px; }
+
+      .scenario-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .scenario-card {
+        display: grid;
+        gap: 9px;
+        padding: 14px;
+        border-left: 2px solid var(--cyan);
+        background: rgba(10, 29, 30, 0.72);
+      }
+
+      .scenario-card strong,
+      .scenario-card b {
+        color: var(--cyan);
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+      }
+
+      .scenario-card span {
+        color: var(--muted);
+        font-size: 0.7rem;
+        line-height: 1.5;
+      }
+
+      .scenario-card b { color: var(--green); }
+
       .visual-shield::before,
       .visual-breadboard::before,
       .visual-wires::before { content: ""; position: absolute; }
@@ -2344,6 +2453,7 @@
         .adaptive-equation { grid-template-columns: repeat(2, 1fr); }
         .profile-row,
         .status-list { grid-template-columns: 1fr; }
+        .scenario-grid { grid-template-columns: 1fr; }
       }
 
       @media (max-width: 800px) {
@@ -2352,22 +2462,22 @@
         }
 
         .exploded-sticky {
-          grid-template-columns: 1fr;
-          align-content: center;
+          display: block;
+          min-height: 620px;
         }
 
-        .exploded-viewport { min-height: 510px; }
+        .exploded-viewport { min-height: 620px; }
         .exploded-stack { inset: 66px 2% 60px; }
         .exploded-layer { height: 68px; }
         .exploded-pipe { height: 370px; }
-        .component-controller { top: 350px; }
-        .component-storage { left: 15%; }
-        .component-sensor { left: 10%; top: 245px; }
-        .component-climate { left: 85%; top: 150px; }
-        .component-relay { left: 10%; top: 315px; }
-        .component-pump { top: 410px; }
-        .component-oled { left: 82%; top: 84px; }
-        .exploded-labels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .component-storage { top: 110px; left: 72%; }
+        .component-oled { top: 175px; left: 72%; }
+        .component-climate { top: 240px; left: 72%; }
+        .component-sensor { top: 230px; left: 28%; }
+        .component-relay { top: 300px; left: 28%; }
+        .component-controller { top: 350px; left: 40%; }
+        .component-pump { top: 320px; left: 60%; }
+        .exploded-labels { position: absolute; top: 640px; left: 0; right: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .exploded-labels .label-intro { grid-column: 1 / -1; }
         .exploded-label { min-height: 38px; }
       }
@@ -2718,27 +2828,69 @@
             <div class="briefing-grid reveal">
               <div class="briefing-panel">
                 <h3>Adaptive decision engine</h3>
-                <p>This is a planned software decision layer, not a claim that the prototype runs machine learning. It combines available readings and selected profiles instead of relying only on one fixed threshold.</p>
+                <p>The system combines available environmental readings and recent moisture behaviour to generate an adaptive irrigation recommendation instead of relying only on one fixed threshold.</p>
+                <div class="adaptive-kicker">Input data / concept</div>
                 <div class="adaptive-equation">
-                  <div class="adaptive-input">SOIL MOISTURE</div>
-                  <div class="adaptive-input">TEMPERATURE</div>
-                  <div class="adaptive-input">HUMIDITY</div>
-                  <div class="adaptive-input">MOISTURE TREND</div>
-                  <div class="adaptive-input">RECENT IRRIGATION</div>
-                  <div class="adaptive-input">SEASON / CROP PROFILE</div>
-                  <div class="adaptive-arrow">↓</div>
-                  <div class="adaptive-output">ADAPTIVE DECISION ENGINE<br />IRRIGATION REQUIREMENT</div>
-                  <div class="adaptive-arrow">↓</div>
-                  <div class="adaptive-output">ESP32 CONTROL LOGIC → RELAY → PUMP</div>
+                  <div class="adaptive-input"><strong>SOIL MOISTURE</strong><small>primary soil condition</small></div>
+                  <div class="adaptive-input"><strong>TEMPERATURE</strong><small>drying tendency</small></div>
+                  <div class="adaptive-input"><strong>HUMIDITY</strong><small>environmental context</small></div>
+                  <div class="adaptive-input"><strong>MOISTURE TREND</strong><small>rising / falling / stable</small></div>
+                  <div class="adaptive-input"><strong>RECENT IRRIGATION</strong><small>previous watering event</small></div>
+                  <div class="adaptive-input"><strong>SEASON / CROP PROFILE</strong><small>software target profile</small></div>
                 </div>
-                <p class="honesty-note">A rapidly falling moisture trend or higher temperature may increase the recommendation. Rising moisture, higher humidity or a recent irrigation event may reduce the immediate requirement.</p>
+                <div class="adaptive-flow" aria-label="Adaptive irrigation decision flow">
+                  <div class="adaptive-arrow">↓</div>
+                  <div class="adaptive-output">ADAPTIVE DECISION ENGINE</div>
+                  <div class="adaptive-arrow">↓</div>
+                  <div class="adaptive-output">IRRIGATION REQUIREMENT</div>
+                  <div class="adaptive-arrow">↓</div>
+                  <div class="adaptive-output">ESP32 CONTROL LOGIC</div>
+                  <div class="adaptive-arrow">↓</div>
+                  <div class="adaptive-output">RELAY</div>
+                  <div class="adaptive-arrow">↓</div>
+                  <div class="adaptive-output">PUMP</div>
+                </div>
+                <div class="adaptive-kicker">How the recommendation changes</div>
+                <ul class="adaptive-points">
+                  <li>Rapidly falling soil moisture can increase irrigation requirement.</li>
+                  <li>Higher temperature can increase the drying tendency.</li>
+                  <li>Higher humidity can reduce the immediate requirement.</li>
+                  <li>Rising moisture can reduce the immediate requirement.</li>
+                  <li>A recent irrigation event can delay another watering cycle.</li>
+                  <li>Season and crop profile can modify target moisture behaviour.</li>
+                </ul>
+                <p class="honesty-note">This is an adaptive/intelligent decision model, not a claim that the physical prototype runs a large machine-learning model.</p>
               </div>
               <div class="briefing-panel">
                 <h3>Software profiles</h3>
-                <p>These are selectable profiles for the future Project App. They apply to the monitored farm as a whole because the physical project has one soil moisture sensor.</p>
+                <p>These software profiles apply to the monitored farm as a whole because the physical project has one soil moisture sensor.</p>
+                <div class="profile-heading">Season mode</div>
                 <div class="profile-row"><div class="profile-item">SUMMER<br /><small>drying tendency may rise sooner</small></div><div class="profile-item">WINTER<br /><small>requirement may be delayed</small></div><div class="profile-item">CUSTOM<br /><small>planned profile</small></div></div>
+                <div class="profile-heading">Crop profile / whole monitored system</div>
                 <div class="profile-row"><div class="profile-item">GENERAL CROPS</div><div class="profile-item">LEAFY PLANTS</div><div class="profile-item">VEGETABLES</div></div>
+                <div class="profile-row"><div class="profile-item">CUSTOM</div></div>
                 <p class="honesty-note">Season modes are software irrigation profiles, not weather forecasts. Crop profiles do not create independent sensing or watering for individual layers.</p>
+              </div>
+            </div>
+            <div class="briefing-grid reveal adaptive-followup">
+              <div class="briefing-panel">
+                <h3>Why not a single threshold?</h3>
+                <p>A fixed threshold treats every situation the same. An adaptive approach can consider environmental conditions, recent moisture behaviour and previous irrigation before recommending the next watering action.</p>
+                <div class="scenario-grid">
+                  <div class="scenario-card"><strong>SCENARIO A / ILLUSTRATIVE</strong><span>LOW MOISTURE + HIGH TEMPERATURE + FALLING TREND</span><b>HIGHER IRRIGATION REQUIREMENT</b></div>
+                  <div class="scenario-card"><strong>SCENARIO B / ILLUSTRATIVE</strong><span>MOISTURE RISING + RECENT IRRIGATION + HIGH HUMIDITY</span><b>LOWER IMMEDIATE REQUIREMENT</b></div>
+                </div>
+              </div>
+              <div class="briefing-panel">
+                <h3>Pump safety logic</h3>
+                <div class="safety-flow">
+                  <div class="safety-node">PUMP ON <strong>→ TIMER START</strong></div>
+                  <div class="safety-arrow">↓</div>
+                  <div class="safety-node">MOISTURE CONDITION CHECK <strong>→ PUMP OFF</strong></div>
+                  <div class="safety-arrow">OR</div>
+                  <div class="safety-node">MAXIMUM RUNTIME REACHED <strong>→ PUMP OFF</strong></div>
+                </div>
+                <p class="honesty-note">A safety timeout helps prevent unnecessary continuous pump operation. This page explains the logic only and sends no hardware commands.</p>
               </div>
             </div>
           </div>
@@ -2771,7 +2923,7 @@
             </div>
             <div class="briefing-panel reveal" style="margin-top: 18px;">
               <h3>Illustrative irrigation history</h3>
-              <p>Example system log format for the future Project App. These records are not readings from the physical prototype.</p>
+              <p>Example system log format for a planned monitoring interface. These records are not readings from the physical prototype.</p>
               <div class="status-list"><div class="status-item"><span>Pump event</span><em>ILLUSTRATIVE</em></div><div class="status-item"><span>Duration</span><em>EXAMPLE</em></div><div class="status-item"><span>Time</span><em>EXAMPLE</em></div><div class="status-item"><span>Event state</span><em>PUMP OFF</em></div></div>
             </div>
           </div>
@@ -2790,12 +2942,12 @@
                 <div class="status-list"><div class="status-item"><span>Normal reading</span><em>SENSOR OK</em></div><div class="status-item"><span>Unexpected value</span><em>CHECK SENSOR</em></div><div class="status-item"><span>No recent value</span><em class="planned">DATA UNAVAILABLE</em></div></div>
               </div>
               <div class="diagnostic-panel">
-                <h3>Future Project App status view</h3>
-                <p>These statuses describe the monitoring interface planned for the separate app. Project Info is not receiving live hardware data.</p>
+                <h3>Conceptual status view</h3>
+                <p>These statuses describe a planned monitoring interface. Project Info is not receiving live hardware data.</p>
                 <div class="status-list"><div class="status-item"><span>ESP32</span><em class="planned">ONLINE</em></div><div class="status-item"><span>Wi-Fi</span><em class="planned">CONNECTED</em></div><div class="status-item"><span>Soil Sensor</span><em class="planned">ACTIVE</em></div><div class="status-item"><span>DHT11</span><em class="planned">ACTIVE</em></div><div class="status-item"><span>Pump</span><em>OFF</em></div><div class="status-item"><span>Cloud</span><em class="planned">CONNECTED</em></div></div>
               </div>
             </div>
-            <div class="farm-brief reveal"><strong>Offline behaviour</strong>If the ESP32 is offline, the future Project App should display OFFLINE, disable hardware controls and send no pump commands. Hardware availability must be communicated clearly to the operator.</div>
+            <div class="farm-brief reveal"><strong>Offline behaviour</strong>If the ESP32 is offline, a future monitoring interface should display OFFLINE, disable hardware controls and send no pump commands. Hardware availability must be communicated clearly to the operator.</div>
           </div>
         </section>
 
@@ -2806,27 +2958,6 @@
               <h2>Reduce Unnecessary Water Use</h2>
             </div>
             <div class="farm-brief reveal"><strong>Rainwater reuse + soil monitoring + adaptive irrigation + controlled pumping + multi-layer farming</strong>The project combines collected rainwater, one soil-moisture input, environmental readings and controlled pump operation to support more deliberate irrigation. No measured percentage of water savings is claimed without an experiment.</div>
-          </div>
-        </section>
-
-        <section class="section technical-section">
-          <div class="container">
-            <div class="section-header reveal">
-              <div class="eyebrow">Boundary / Future Work</div>
-              <h2>Project Info vs Project App</h2>
-            </div>
-            <div class="future-grid reveal">
-              <div class="future-panel">
-                <h3>PROJECT INFO</h3>
-                <p>Explanation, architecture, hardware, adaptive-logic concept, technical animations and team presentation. It sends no physical commands.</p>
-                <div class="status-list"><div class="status-item"><span>Purpose</span><em>EXPLAIN</em></div><div class="status-item"><span>Hardware control</span><em>NONE</em></div><div class="status-item"><span>Readings</span><em>ILLUSTRATIVE</em></div></div>
-              </div>
-              <div class="future-panel">
-                <h3>PROJECT APP / PLANNED</h3>
-                <p>The separate future interface is intended for live monitoring, settings, history, diagnostics and physical control. It is not being built here.</p>
-                <div class="future-path"><div class="future-node">JUDGE PHONE <strong>→</strong></div><div class="future-arrow">↓</div><div class="future-node">PROJECT APP <strong>→</strong></div><div class="future-arrow">↓</div><div class="future-node">SECURE BACKEND / API <strong>→</strong></div><div class="future-arrow">↓</div><div class="future-node">BLYNK CLOUD → ESP32 → RELAY → PUMP</div></div>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -2856,7 +2987,7 @@
 
                 <div class="logic-panel">
                   <div class="logic-step"><b>01</b><div><strong>AUTOMATIC OPERATION</strong><span>Irrigation can be initiated when the measured soil condition indicates that watering is required.</span></div></div>
-                  <div class="logic-step"><b>02</b><div><strong>MANUAL OPERATION</strong><span>Manual operation is a system capability for the separate Project App, not an interactive control on this page.</span></div></div>
+                  <div class="logic-step"><b>02</b><div><strong>MANUAL OPERATION</strong><span>Manual operation is a planned capability for a separate control interface, not an interactive control on this page.</span></div></div>
                 </div>
               </div>
 
@@ -3279,7 +3410,19 @@
           const bounds = stage.getBoundingClientRect();
           const travel = Math.max(stage.offsetHeight - window.innerHeight, 1);
           const progress = Math.max(0, Math.min(1, -bounds.top / travel));
-          const lifts = {
+          const lifts = window.innerWidth <= 800 ? {
+            'layer-3': -100 * progress,
+            'layer-2': -64 * progress,
+            'layer-1': -30 * progress,
+            pipe: 20 * progress,
+            storage: -60 * progress,
+            sensor: 55 * progress,
+            climate: -40 * progress,
+            controller: 70 * progress,
+            relay: 85 * progress,
+            pump: 100 * progress,
+            oled: -70 * progress
+          } : {
             'layer-3': -150 * progress,
             'layer-2': -96 * progress,
             'layer-1': -45 * progress,
@@ -3289,8 +3432,8 @@
             climate: -78 * progress,
             controller: 118 * progress,
             relay: 145 * progress,
-                    pump: 185 * progress,
-                    oled: -128 * progress
+                      pump: 185 * progress,
+                      oled: -128 * progress
           };
 
           parts.forEach((part) => {
