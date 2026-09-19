@@ -1,5 +1,9 @@
 ﻿const BLYNK_AUTH_TOKEN = "IMz1W97RnK2l9Y_cGsoBEzPGsKr1jQt-";
 const BLYNK_API_BASE = "https://blynk.cloud/external/api";
+const BLYNK_VIRTUAL_PINS = {
+  temperature: "V1",
+  humidity: "V2",
+};
 
 const translations = {
   en: {
@@ -149,6 +153,54 @@ function setText(selector, value) {
   });
 }
 
+async function getBlynkPinValue(pinName) {
+  const response = await fetch(`${BLYNK_API_BASE}/get?token=${encodeURIComponent(BLYNK_AUTH_TOKEN)}&${pinName}`, { cache: "no-store" });
+
+  if (!response.ok) {
+    throw new Error(`Unable to reach Blynk pin ${pinName}.`);
+  }
+
+  const text = await response.text();
+  const cleaned = String(text).trim();
+
+  console.log(`[BLYNK ${pinName}] raw response:`, text);
+
+  if (!cleaned || cleaned === "null" || cleaned === "undefined") {
+    console.log(`[BLYNK ${pinName}] parsed value:`, null);
+    return null;
+  }
+
+  const numericValue = Number(cleaned);
+  const resolvedValue = Number.isFinite(numericValue) ? numericValue : null;
+  console.log(`[BLYNK ${pinName}] parsed value:`, resolvedValue);
+  return resolvedValue;
+}
+
+function updateMeterProgress() {
+  const soilValue = typeof systemState.soilMoisture === "number" ? systemState.soilMoisture : null;
+  const humidityValue = typeof systemState.humidity === "number" ? systemState.humidity : null;
+  const temperatureValue = typeof systemState.temperature === "number" ? systemState.temperature : null;
+
+  const setProgress = (selector, value, min, max) => {
+    const meter = document.querySelector(selector);
+    if (!meter) return;
+
+    if (value === null || Number.isNaN(value)) {
+      meter.style.setProperty("--progress", 0);
+      return;
+    }
+
+    const safeValue = Math.min(Math.max(value, min), max);
+    const ratio = ((safeValue - min) / (max - min)) * 100;
+    meter.style.setProperty("--progress", ratio);
+  };
+
+  setProgress(".dial-soil", soilValue, 0, 100);
+  setProgress(".dial-humidity", humidityValue, 0, 100);
+  setProgress(".dial-temperature", temperatureValue, 0, 60);
+  setProgress(".dial-pump", systemState.esp32Online && systemState.pumpCommand === "ON" ? 100 : 0, 0, 100);
+}
+
 function updateLanguage() {
   const selectedLang = systemState.language === "hi" ? "hi" : "en";
   systemState.language = selectedLang;
@@ -220,6 +272,9 @@ function renderSystemState() {
     humidity: systemState.humidity === null ? "--" : `${systemState.humidity}`,
     temperature: systemState.temperature === null ? "--" : `${systemState.temperature}`,
   };
+
+  console.log("[GAUGE] updating temperature:", valueLabels.temperature, "status:", temperatureStatus);
+  console.log("[GAUGE] updating humidity:", valueLabels.humidity, "status:", humidityStatus);
 
   Object.entries(valueLabels).forEach(([key, value]) => setText(`[data-value="${key}"]`, value));
 
@@ -335,6 +390,7 @@ function renderSystemState() {
 
   const selectedComponent = document.querySelector(".component-item.is-selected")?.dataset.component || "esp32";
   updateComponentInfo(selectedComponent);
+  updateMeterProgress();
 }
 
 async function getSystemStatus() {
@@ -375,15 +431,31 @@ async function refreshHardwareStatus() {
   renderSystemState();
 
   try {
-    const status = await getSystemStatus();
+    console.log("[POLL] refreshHardwareStatus start");
+    const [status, temperatureValue, humidityValue] = await Promise.all([
+      getSystemStatus(),
+      getBlynkPinValue(BLYNK_VIRTUAL_PINS.temperature),
+      getBlynkPinValue(BLYNK_VIRTUAL_PINS.humidity),
+    ]);
+
+    console.log("[POLL] temperatureValue:", temperatureValue, "humidityValue:", humidityValue, "esp32Online:", Boolean(status && status.online));
+
     const connected = Boolean(status && status.online);
     systemState.esp32Online = connected;
     systemState.wifiConnected = connected || Boolean(status && status.wifiConnected);
     systemState.cloudConnected = connected || Boolean(status && status.cloudConnected);
     systemState.statusState = connected ? "ONLINE" : "OFFLINE";
-    if (status && typeof status.soilMoisture !== "undefined") systemState.soilMoisture = status.soilMoisture;
-    if (status && typeof status.temperature !== "undefined") systemState.temperature = status.temperature;
-    if (status && typeof status.humidity !== "undefined") systemState.humidity = status.humidity;
+
+    if (!connected) {
+      systemState.soilMoisture = null;
+      systemState.temperature = null;
+      systemState.humidity = null;
+    } else {
+      systemState.temperature = typeof temperatureValue === "number" ? Number(temperatureValue) : null;
+      systemState.humidity = typeof humidityValue === "number" ? Number(humidityValue) : null;
+      systemState.soilMoisture = typeof systemState.soilMoisture === "number" ? systemState.soilMoisture : null;
+    }
+
     renderSystemState();
   } catch (error) {
     systemState.esp32Online = false;
