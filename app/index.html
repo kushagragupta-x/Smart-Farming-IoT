@@ -1,21 +1,31 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Project App interface for the Smart Farming IoT exhibition prototype." />
+    <meta name="description" content="Smart Farming IoT prototype dashboard." />
     <title>Prototype Smart Farm | Project App</title>
-    <link rel="stylesheet" href="style.css?v=20260918-1" />
+    <link rel="stylesheet" href="style.css?v=20260919-1" />
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <a class="brand" href="#home" aria-label="Prototype Smart Farm home">
+        <div class="brand" aria-label="Prototype Smart Farm home">
           <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span><b>PROTOTYPE</b><strong>SMART FARM</strong></span>
-        </a>
+          <div>
+            <span class="brand-tag">PROTOTYPE</span>
+            <span class="brand-name" data-i18n="brandTitle">SMART FARM</span>
+          </div>
+        </div>
+
         <div class="topbar-actions">
-          <a class="project-info-link" href="/Smart-Farming-IoT/">PROJECT INFO</a>
+          <a class="project-info-link" href="/Smart-Farming-IoT/" data-i18n="projectInfo">PROJECT INFO</a>
+
+          <div class="lang-toggle" aria-label="Language selector">
+            <button type="button" class="lang-btn is-active" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="hi">हिन्दी</button>
+          </div>
+
           <div class="connection-badge" data-connection-badge>
             <span class="status-dot"></span>
             <span data-connection-label>CHECKING...</span>
@@ -23,79 +33,251 @@
         </div>
       </header>
 
-      <main>
-        <section class="hero" id="home">
-          <div class="hero-gridline" aria-hidden="true"></div>
-          <div class="eyebrow">PROJECT APP / CONTROL INTERFACE</div>
-          <h1>Operational view for the smart irrigation prototype.</h1>
-          <p class="hero-copy">Secure API polling checks the real Blynk Cloud hardware connection state for the ESP32.</p>
+      <main class="dashboard">
+        <section class="status-strip-panel" aria-label="System status overview">
+          <div class="panel-header compact-header">
+            <span class="card-label" data-i18n="systemStatus">SYSTEM STATUS</span>
+          </div>
           <div class="hero-status" data-hero-status>
             <span class="status-dot"></span>
             <span data-esp32-status-text>ESP32 OFFLINE</span>
             <small data-esp32-status-meta>CHECKING...</small>
           </div>
-        </section>
-
-        <section class="section" aria-labelledby="dashboard-title">
-          <div class="section-heading"><div><span class="section-code">01 / OVERVIEW</span><h2 id="dashboard-title">System dashboard</h2></div><span class="read-only">LOCAL STATE</span></div>
-          <div class="sensor-grid">
-            <article class="metric-card metric-primary"><span class="card-label">SOIL MOISTURE</span><strong data-value="soilMoisture">--</strong><span class="metric-unit">%</span><small data-status="soilMoisture">NO SENSOR DATA</small><em>TREND UNAVAILABLE</em></article>
-            <article class="metric-card"><span class="card-label">TEMPERATURE</span><strong data-value="temperature">--</strong><span class="metric-unit">°C</span><small data-status="temperature">NO SENSOR DATA</small><em>TREND UNAVAILABLE</em></article>
-            <article class="metric-card"><span class="card-label">HUMIDITY</span><strong data-value="humidity">--</strong><span class="metric-unit">%</span><small data-status="humidity">NO SENSOR DATA</small><em>TREND UNAVAILABLE</em></article>
-          </div>
           <div class="status-strip" data-status-strip></div>
         </section>
 
-        <section class="section" id="irrigation" aria-labelledby="irrigation-title">
-          <div class="section-heading"><div><span class="section-code">02 / IRRIGATION</span><h2 id="irrigation-title">Irrigation control</h2></div><span class="read-only">BACKEND REQUIRED</span></div>
-          <div class="control-layout">
-            <article class="control-panel">
-              <div class="panel-topline"><span class="card-label">PUMP STATUS</span><span class="state-pill state-off" data-pump-state>NOT CONNECTED</span></div>
-              <p class="panel-value">No hardware command has been sent.</p>
-              <div class="mode-switch" role="group" aria-label="Irrigation mode">
-                <button type="button" class="mode-button is-selected" data-mode="AUTO">AUTOMATIC</button>
-                <button type="button" class="mode-button" data-mode="MANUAL">MANUAL</button>
+        <section class="gauge-grid" aria-label="Primary sensor metrics">
+          <article class="gauge-card primary-card">
+            <div class="gauge-header">
+              <span class="card-label" data-i18n="soilMoisture">SOIL MOISTURE</span>
+              <span class="meter-pulse"></span>
+            </div>
+            <div class="gauge dial-soil">
+              <div class="gauge-ring"
+                aria-hidden="true"></div>
+              <div class="gauge-inner">
+                <strong data-value="soilMoisture">--</strong>
+                <small>%</small>
               </div>
-              <button class="pump-button" type="button" data-pump-command disabled>PUMP CONTROL UNAVAILABLE</button>
-              <p class="notice" data-command-message>ESP32 is offline. Pump controls are disabled.</p>
-            </article>
-            <article class="explanation-panel">
-              <span class="card-label">CONTROL MODEL</span>
-              <h3>Command safety first</h3>
-              <p>Automatic mode will use the irrigation decision from the backend. Manual mode will be available only after a secure connection confirms that the ESP32 is online.</p>
-              <div class="mini-flow"><span>SENSOR DATA</span><i>→</i><span>SECURE API</span><i>→</i><span>HARDWARE</span></div>
-            </article>
-          </div>
-        </section>
-
-        <section class="section" id="insights" aria-labelledby="insights-title">
-          <div class="section-heading"><div><span class="section-code">03 / INSIGHTS</span><h2 id="insights-title">Adaptive irrigation</h2></div><span class="read-only">CONCEPT READY</span></div>
-          <article class="adaptive-panel">
-            <div class="panel-topline"><div><span class="card-label">AI-ASSISTED ADAPTIVE IRRIGATION</span><h3>Decision layer</h3></div><span class="state-pill state-neutral" data-requirement>UNAVAILABLE</span></div>
-            <p>The adaptive irrigation layer considers soil moisture, environmental conditions, recent moisture behaviour and irrigation history when determining the irrigation requirement.</p>
-            <div class="insight-grid"><div><span>MOISTURE TREND</span><strong data-trend>UNAVAILABLE</strong></div><div><span>REQUIREMENT</span><strong data-requirement-copy>UNAVAILABLE</strong></div></div>
+            </div>
+            <div class="gauge-status" data-status="soilMoisture">NO SENSOR DATA</div>
           </article>
-          <div class="settings-grid">
-            <article class="settings-panel"><span class="card-label">SEASON PROFILE</span><div class="choice-grid" data-setting="season"><button type="button" data-choice="SUMMER">SUMMER</button><button type="button" data-choice="WINTER">WINTER</button><button type="button" data-choice="CUSTOM">CUSTOM</button></div><small>Software profile for the monitored system.</small></article>
-            <article class="settings-panel"><span class="card-label">CROP PROFILE</span><div class="choice-grid" data-setting="crop"><button type="button" data-choice="GENERAL CROPS">GENERAL</button><button type="button" data-choice="LEAFY PLANTS">LEAFY</button><button type="button" data-choice="VEGETABLES">VEGETABLES</button><button type="button" data-choice="CUSTOM">CUSTOM</button></div><small>One soil sensor applies to the whole farm.</small></article>
+
+          <article class="gauge-card">
+            <div class="gauge-header">
+              <span class="card-label" data-i18n="humidity">HUMIDITY</span>
+              <span class="meter-pulse"></span>
+            </div>
+            <div class="gauge dial-humidity">
+              <div class="gauge-ring" aria-hidden="true"></div>
+              <div class="gauge-inner">
+                <strong data-value="humidity">--</strong>
+                <small>%</small>
+              </div>
+            </div>
+            <div class="gauge-status" data-status="humidity">NO SENSOR DATA</div>
+          </article>
+
+          <article class="gauge-card">
+            <div class="gauge-header">
+              <span class="card-label" data-i18n="temperature">TEMPERATURE</span>
+              <span class="meter-pulse"></span>
+            </div>
+            <div class="gauge dial-temperature">
+              <div class="gauge-ring" aria-hidden="true"></div>
+              <div class="gauge-inner">
+                <strong data-value="temperature">--</strong>
+                <small>°C</small>
+              </div>
+            </div>
+            <div class="gauge-status" data-status="temperature">NO SENSOR DATA</div>
+          </article>
+
+          <article class="gauge-card pump-card">
+            <div class="gauge-header">
+              <span class="card-label" data-i18n="pumpStatus">PUMP STATUS</span>
+              <span class="meter-pulse"></span>
+            </div>
+            <div class="gauge dial-pump">
+              <div class="gauge-ring" aria-hidden="true"></div>
+              <div class="gauge-inner tank-status">
+                <strong data-pump-state>NOT CONNECTED</strong>
+              </div>
+            </div>
+            <div class="gauge-status" data-pump-readout>OFFLINE</div>
+          </article>
+        </section>
+
+        <section class="detail-grid">
+          <article class="panel system-panel">
+            <div class="panel-header">
+              <span class="card-label" data-i18n="waterSystem">WATER SYSTEM</span>
+              <span class="badge-state state-neutral" data-requirement>UNAVAILABLE</span>
+            </div>
+
+            <div class="system-flow">
+              <div class="node">RAINWATER</div>
+              <div class="flow-arrow">↓</div>
+              <div class="node">STORAGE</div>
+              <div class="flow-arrow">↓</div>
+              <div class="node">PUMP</div>
+              <div class="flow-arrow">↓</div>
+              <div class="node">RELAY</div>
+              <div class="flow-arrow">↓</div>
+              <div class="node pipe-node">TRANSPARENT PIPE</div>
+              <div class="flow-arrow">↓</div>
+              <div class="node farm-node">3-LAYER FARM</div>
+            </div>
+
+            <div class="wire-list">
+              <div class="wire-item"><span>SOIL SENSOR</span><span>→</span><span>ESP32</span></div>
+              <div class="wire-item"><span>DHT11</span><span>→</span><span>ESP32</span></div>
+              <div class="wire-item"><span>ESP32</span><span>→</span><span>OLED</span></div>
+              <div class="wire-item"><span>ESP32</span><span>→</span><span>Blynk</span></div>
+            </div>
+          </article>
+
+          <article class="panel control-panel">
+            <div class="panel-header">
+              <span class="card-label" data-i18n="pumpControl">PUMP CONTROL</span>
+            </div>
+
+            <div class="mode-group" role="group" aria-label="Irrigation mode">
+              <button type="button" class="mode-button is-selected" data-mode="AUTO" data-i18n="automatic">AUTOMATIC</button>
+              <button type="button" class="mode-button" data-mode="MANUAL" data-i18n="manual">MANUAL</button>
+            </div>
+
+            <div class="pump-toggle-row" aria-label="Pump state controls">
+              <button type="button" class="pump-toggle is-selected" data-pump-toggle="ON">ON</button>
+              <button type="button" class="pump-toggle" data-pump-toggle="OFF">OFF</button>
+            </div>
+
+            <button class="pump-button" type="button" data-pump-command disabled>PUMP CONTROL UNAVAILABLE</button>
+
+            <div class="control-meta">
+              <div class="select-block">
+                <label data-i18n="season">SEASON</label>
+                <div class="choice-grid" data-setting="season">
+                  <button type="button" data-choice="SUMMER" class="is-selected">SUMMER</button>
+                  <button type="button" data-choice="WINTER">WINTER</button>
+                </div>
+              </div>
+
+              <div class="select-block">
+                <label data-i18n="cropProfile">CROP PROFILE</label>
+                <div class="choice-grid" data-setting="crop">
+                  <button type="button" data-choice="GENERAL CROPS" class="is-selected">GENERAL</button>
+                  <button type="button" data-choice="LEAFY PLANTS">LEAFY</button>
+                  <button type="button" data-choice="VEGETABLES">VEGETABLES</button>
+                  <button type="button" data-choice="CUSTOM">CUSTOM</button>
+                </div>
+              </div>
+            </div>
+
+            <p class="notice" data-command-message>ESP32 is offline. Pump controls are disabled.</p>
+          </article>
+        </section>
+
+        <section class="bottom-grid">
+          <article class="panel chart-panel">
+            <div class="panel-header">
+              <span class="card-label" data-i18n="soilMoistureTrend">SOIL MOISTURE TREND</span>
+            </div>
+            <div class="mini-chart" aria-label="Soil moisture trend chart">
+              <div class="chart-bar" style="--h: 34%"></div>
+              <div class="chart-bar" style="--h: 44%"></div>
+              <div class="chart-bar" style="--h: 50%"></div>
+              <div class="chart-bar" style="--h: 58%"></div>
+              <div class="chart-bar" style="--h: 70%"></div>
+              <div class="chart-bar is-active" style="--h: 88%"></div>
+            </div>
+            <div class="chart-caption" data-trend>UNAVAILABLE</div>
+          </article>
+
+          <article class="panel adaptive-panel">
+            <div class="panel-header">
+              <span class="card-label" data-i18n="adaptiveIrrigation">ADAPTIVE IRRIGATION</span>
+            </div>
+            <div class="adaptive-flow">
+              <span data-i18n="soilMoisture">SOIL MOISTURE</span>
+              <span>↓</span>
+              <span data-i18n="temperature">TEMPERATURE</span>
+              <span>↓</span>
+              <span data-i18n="humidity">HUMIDITY</span>
+              <span>↓</span>
+              <span data-i18n="season">SEASON</span>
+              <span>↓</span>
+              <span data-i18n="cropProfile">CROP PROFILE</span>
+              <span>↓</span>
+              <span data-i18n="moistureTrend">MOISTURE TREND</span>
+              <span>↓</span>
+              <strong data-i18n="adaptiveDecision">ADAPTIVE DECISION</strong>
+              <span>↓</span>
+              <strong data-i18n="irrigationRequired">IRRIGATION REQUIRED?</strong>
+              <span>↓</span>
+              <strong>ESP32 → RELAY → PUMP</strong>
+            </div>
+            <div class="requirement-row">
+              <span data-i18n="requirement">REQUIREMENT</span>
+              <strong data-requirement-copy>UNAVAILABLE</strong>
+            </div>
+          </article>
+        </section>
+
+        <section class="component-panel panel" aria-label="System components">
+          <div class="panel-header">
+            <span class="card-label" data-i18n="componentStatus">COMPONENT STATUS</span>
           </div>
-        </section>
 
-        <section class="section" id="history" aria-labelledby="history-title">
-          <div class="section-heading"><div><span class="section-code">04 / HISTORY</span><h2 id="history-title">Irrigation history</h2></div><span class="read-only">NO LIVE RECORDS</span></div>
-          <article class="empty-panel"><div class="empty-mark">—</div><h3>NO IRRIGATION HISTORY</h3><p>Events will appear here after the secure data connection is implemented.</p><div class="history-head"><span>TIME</span><span>PUMP STATE</span><span>DURATION</span><span>MOISTURE</span></div></article>
-        </section>
+          <div class="component-strip">
+            <button type="button" class="component-item is-selected" data-component="esp32">
+              <span class="component-icon">E</span>
+              <span class="component-name">ESP32</span>
+              <span class="component-state" data-component-status="esp32">OFFLINE</span>
+            </button>
+            <button type="button" class="component-item" data-component="soilSensor">
+              <span class="component-icon">S</span>
+              <span class="component-name" data-i18n="soilSensor">SOIL SENSOR</span>
+              <span class="component-state" data-component-status="soilSensor">DATA UNAVAILABLE</span>
+            </button>
+            <button type="button" class="component-item" data-component="dht11">
+              <span class="component-icon">D</span>
+              <span class="component-name">DHT11</span>
+              <span class="component-state" data-component-status="dht11">DATA UNAVAILABLE</span>
+            </button>
+            <button type="button" class="component-item" data-component="oled">
+              <span class="component-icon">O</span>
+              <span class="component-name">OLED</span>
+              <span class="component-state" data-component-status="oled">STANDBY</span>
+            </button>
+            <button type="button" class="component-item" data-component="relay">
+              <span class="component-icon">R</span>
+              <span class="component-name" data-i18n="relay">RELAY</span>
+              <span class="component-state" data-component-status="relay">READY</span>
+            </button>
+            <button type="button" class="component-item" data-component="pump">
+              <span class="component-icon">P</span>
+              <span class="component-name" data-i18n="pump">PUMP</span>
+              <span class="component-state" data-component-status="pump">OFFLINE</span>
+            </button>
+          </div>
 
-        <section class="section" id="system" aria-labelledby="system-title">
-          <div class="section-heading"><div><span class="section-code">05 / SYSTEM</span><h2 id="system-title">Diagnostics</h2></div><span class="read-only">EXPLANATORY STATE</span></div>
-          <article class="diagnostics-panel"><div class="diagnostic-row"><span>ESP32</span><b data-system-status="esp32">OFFLINE</b></div><div class="diagnostic-row"><span>WI-FI</span><b data-system-status="wifi">UNAVAILABLE</b></div><div class="diagnostic-row"><span>CLOUD</span><b data-system-status="cloud">UNAVAILABLE</b></div><div class="diagnostic-row"><span>SOIL SENSOR</span><b data-system-status="soilSensor">DATA UNAVAILABLE</b></div><div class="diagnostic-row"><span>DHT11</span><b data-system-status="dht11">DATA UNAVAILABLE</b></div><div class="diagnostic-row"><span>PUMP</span><b data-system-status="pump">OFFLINE</b></div></article>
-          <div class="safety-callout"><strong>OFFLINE SAFETY</strong><span>If the ESP32 is offline, controls remain disabled and no pump command is sent.</span></div>
+          <div class="info-panel" id="componentInfo" aria-live="polite">
+            <div class="info-header">
+              <strong id="componentInfoName">ESP32</strong>
+              <span id="componentInfoStatus">OFFLINE</span>
+            </div>
+            <p id="componentInfoText">Controls the irrigation logic and maintains the secure Blynk connection.</p>
+          </div>
         </section>
       </main>
 
-      <nav class="bottom-nav" aria-label="Main navigation"><a class="is-active" href="#home">HOME</a><a href="#irrigation">IRRIGATION</a><a href="#insights">INSIGHTS</a><a href="#history">HISTORY</a><a href="#system">SYSTEM</a></nav>
-      <footer><span>PROJECT APP / LOCAL UI BUILD</span><span>SECURE API CONNECTION PENDING</span></footer>
+      <footer class="site-footer">
+        <span>PROJECT APP / LOCAL UI BUILD</span>
+        <span>SECURE API CONNECTION PENDING</span>
+      </footer>
     </div>
-    <script src="app.js?v=20260918-1" defer></script>
+
+    <script src="app.js?v=20260919-1" defer></script>
   </body>
 </html>
