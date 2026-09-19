@@ -264,8 +264,9 @@ function renderSystemState() {
   const cloudLabel = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.cloudConnected ? t("online", "ONLINE") : t("offline", "OFFLINE");
 
   const soilStatus = systemState.soilMoisture === null ? t("noSensorData", "NO SENSOR DATA") : `${systemState.soilMoisture}%`;
-  const humidityStatus = systemState.humidity === null ? t("noSensorData", "NO SENSOR DATA") : `${systemState.humidity}%`;
-  const temperatureStatus = systemState.temperature === null ? t("noSensorData", "NO SENSOR DATA") : `${systemState.temperature}°C`;
+  const humidityStatus = systemState.humidity === null ? t("noSensorData", "NO SENSOR DATA") : systemState.esp32Online ? "LIVE DATA" : "ESP32 OFFLINE";
+  const temperatureStatus = systemState.temperature === null ? t("noSensorData", "NO SENSOR DATA") : systemState.esp32Online ? "LIVE DATA" : "ESP32 OFFLINE";
+  const soilStatusText = systemState.soilMoisture === null ? t("noSensorData", "NO SENSOR DATA") : systemState.esp32Online ? "SENSOR OK" : "ESP32 OFFLINE";
 
   const valueLabels = {
     soilMoisture: systemState.soilMoisture === null ? "--" : `${systemState.soilMoisture}`,
@@ -278,7 +279,7 @@ function renderSystemState() {
 
   Object.entries(valueLabels).forEach(([key, value]) => setText(`[data-value="${key}"]`, value));
 
-  setText("[data-status=soilMoisture]", soilStatus);
+  setText("[data-status=soilMoisture]", soilStatusText);
   setText("[data-status=humidity]", humidityStatus);
   setText("[data-status=temperature]", temperatureStatus);
 
@@ -336,11 +337,11 @@ function renderSystemState() {
 
   const pumpStatus = systemState.esp32Online ? (systemState.pumpCommand === "ON" ? t("pumpOn", "PUMP ON") : t("pumpOff", "PUMP OFF")) : t("pumpNotConnected", "NOT CONNECTED");
   if (elements.pumpState) {
-    elements.pumpState.textContent = pumpStatus;
+    elements.pumpState.textContent = systemState.esp32Online ? (systemState.pumpCommand === "ON" ? "ON" : "OFF") : "OFF";
     elements.pumpState.classList.remove("state-off", "state-on", "state-neutral");
     elements.pumpState.classList.add(systemState.esp32Online && systemState.pumpCommand === "ON" ? "state-on" : "state-off");
   }
-  if (elements.pumpReadout) elements.pumpReadout.textContent = systemState.esp32Online ? (systemState.pumpCommand === "ON" ? t("pumpOn", "PUMP ON") : t("pumpOff", "PUMP OFF")) : t("offline", "OFFLINE");
+  if (elements.pumpReadout) elements.pumpReadout.textContent = systemState.esp32Online ? (systemState.pumpCommand === "ON" ? "PUMP ACTIVE" : "PUMP READY") : "SYSTEM OFFLINE";
 
   const pumpDisabled = !systemState.esp32Online || isChecking || isConnectionError;
   if (elements.pumpButton) {
