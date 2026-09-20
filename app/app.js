@@ -176,29 +176,67 @@ async function getBlynkPinValue(pinName) {
   return resolvedValue;
 }
 
+const GAUGE_GEOMETRY = {
+  centerX: 120,
+  centerY: 142,
+  tickRadius: 88,
+  tickCount: 11,
+};
+
+function initializeGaugeGeometry() {
+  document.querySelectorAll(".gauge").forEach((gauge) => {
+    const tickGroup = gauge.querySelector(".gauge-ticks");
+    if (!tickGroup || tickGroup.childElementCount) return;
+
+    for (let index = 0; index < GAUGE_GEOMETRY.tickCount; index += 1) {
+      const ratio = index / (GAUGE_GEOMETRY.tickCount - 1);
+      const angle = Math.PI + (ratio * Math.PI);
+      const outerRadius = GAUGE_GEOMETRY.tickRadius + 7;
+      const innerRadius = GAUGE_GEOMETRY.tickRadius - (index % 5 === 0 ? 7 : 4);
+      const x1 = GAUGE_GEOMETRY.centerX + (Math.cos(angle) * innerRadius);
+      const y1 = GAUGE_GEOMETRY.centerY + (Math.sin(angle) * innerRadius);
+      const x2 = GAUGE_GEOMETRY.centerX + (Math.cos(angle) * outerRadius);
+      const y2 = GAUGE_GEOMETRY.centerY + (Math.sin(angle) * outerRadius);
+      const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      tick.setAttribute("x1", x1.toFixed(2));
+      tick.setAttribute("y1", y1.toFixed(2));
+      tick.setAttribute("x2", x2.toFixed(2));
+      tick.setAttribute("y2", y2.toFixed(2));
+      if (index % 5 === 0) tick.classList.add("major");
+      tickGroup.appendChild(tick);
+    }
+  });
+}
+
+function renderGauge(selector, value, min, max, hasValue = true) {
+  const meter = document.querySelector(selector);
+  if (!meter) return;
+
+  const progressArc = meter.querySelector(".gauge-progress");
+  const needle = meter.querySelector(".gauge-needle");
+  const numericValue = typeof value === "number" && Number.isFinite(value) ? value : null;
+  const visible = hasValue && numericValue !== null;
+  const safeValue = visible ? Math.min(Math.max(numericValue, min), max) : min;
+  const ratio = visible ? (safeValue - min) / (max - min) : 0;
+  const percentage = ratio * 100;
+
+  meter.style.setProperty("--progress", percentage);
+  if (progressArc) progressArc.style.strokeDashoffset = `${100 - percentage}`;
+  if (needle) {
+    needle.style.opacity = visible ? "1" : "0";
+    needle.style.transform = `rotate(${ratio * 180}deg)`;
+  }
+}
+
 function updateMeterProgress() {
   const soilValue = typeof systemState.soilMoisture === "number" ? systemState.soilMoisture : null;
   const humidityValue = typeof systemState.humidity === "number" ? systemState.humidity : null;
   const temperatureValue = typeof systemState.temperature === "number" ? systemState.temperature : null;
 
-  const setProgress = (selector, value, min, max) => {
-    const meter = document.querySelector(selector);
-    if (!meter) return;
-
-    if (value === null || Number.isNaN(value)) {
-      meter.style.setProperty("--progress", 0);
-      return;
-    }
-
-    const safeValue = Math.min(Math.max(value, min), max);
-    const ratio = ((safeValue - min) / (max - min)) * 100;
-    meter.style.setProperty("--progress", ratio);
-  };
-
-  setProgress(".dial-soil", soilValue, 0, 100);
-  setProgress(".dial-humidity", humidityValue, 0, 100);
-  setProgress(".dial-temperature", temperatureValue, 0, 60);
-  setProgress(".dial-pump", systemState.esp32Online && systemState.pumpCommand === "ON" ? 100 : 0, 0, 100);
+  renderGauge(".dial-soil", soilValue, 0, 100, soilValue !== null);
+  renderGauge(".dial-humidity", humidityValue, 0, 100, humidityValue !== null);
+  renderGauge(".dial-temperature", temperatureValue, 0, 60, temperatureValue !== null);
+  renderGauge(".dial-pump", systemState.pumpCommand === "ON" ? 100 : 0, 0, 100, systemState.esp32Online);
 }
 
 function updateLanguage() {
@@ -561,6 +599,7 @@ function initializeUi() {
     button.classList.toggle("is-active", button.dataset.lang === systemState.language);
   });
 
+  initializeGaugeGeometry();
   renderSystemState();
   updateComponentInfo("esp32");
   bindControls();

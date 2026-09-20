@@ -12,6 +12,8 @@
   --green: #7ae0ab;
   --amber: #f0c77b;
   --danger: #f28c87;
+  --ink: #020908;
+  --grid: rgba(126, 214, 184, 0.055);
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
   --radius: 18px;
 }
@@ -25,7 +27,7 @@ body {
     radial-gradient(circle at top right, rgba(26, 121, 107, 0.17), transparent 30%),
     linear-gradient(145deg, #07110f 0%, #091816 46%, #050d0d 100%);
   color: var(--text);
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   line-height: 1.5;
   overflow-x: hidden;
 }
@@ -213,6 +215,14 @@ a { color: inherit; text-decoration: none; }
   gap: 12px;
   margin-bottom: 12px;
 }
+.panel-code,
+.chart-unit {
+  color: rgba(156, 183, 177, 0.72);
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
 .compact-header { margin-bottom: 14px; }
 .card-label, .eyebrow {
   color: var(--cyan);
@@ -265,11 +275,26 @@ a { color: inherit; text-decoration: none; }
 .gauge-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: 16px;
 }
 
 .gauge-card {
-  padding: 16px 16px 14px;
+  position: relative;
+  overflow: hidden;
+  padding: 14px 8px 12px;
+  min-width: 0;
+  min-height: 286px;
+  background: rgba(3, 12, 11, 0.38);
+  border-color: rgba(131, 206, 204, 0.1);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.16);
+}
+.gauge-card::after {
+  position: absolute;
+  inset: auto 14px 0;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(109, 220, 203, 0.18), transparent);
 }
 .primary-card { border-color: var(--line-strong); }
 .gauge-header {
@@ -289,26 +314,62 @@ a { color: inherit; text-decoration: none; }
 
 .gauge {
   position: relative;
-  width: min(100%, 210px);
-  height: min(18vw, 150px);
-  margin: 10px auto 6px;
+  width: min(100%, 270px);
+  aspect-ratio: 4 / 3;
+  height: auto;
+  margin: 8px auto 4px;
   display: grid;
   place-items: center;
 }
-.gauge-ring {
+.gauge-svg {
   position: absolute;
-  inset: 8px 8px 0;
-  border: 2px solid rgba(117, 218, 243, 0.2);
-  border-top-color: rgba(117, 218, 243, 0.7);
-  border-right-color: rgba(122, 224, 171, 0.8);
-  border-radius: 50% 50% 55% 45% / 58% 52% 48% 42%;
-  transform: rotate(-12deg);
-  box-shadow: inset 0 0 12px rgba(117, 218, 243, 0.08);
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
-.dial-soil .gauge-ring { border-top-color: rgba(122, 224, 171, 0.7); border-right-color: rgba(122, 224, 171, 0.35); }
-.dial-humidity .gauge-ring { border-top-color: rgba(117, 218, 243, 0.7); border-right-color: rgba(117, 218, 243, 0.4); }
-.dial-temperature .gauge-ring { border-top-color: rgba(240, 199, 123, 0.7); border-right-color: rgba(240, 199, 123, 0.38); }
-.dial-pump .gauge-ring { border-top-color: rgba(242, 140, 135, 0.7); border-right-color: rgba(242, 140, 135, 0.38); }
+.dial-soil { --gauge-color: var(--green); }
+.dial-humidity { --gauge-color: var(--cyan); }
+.dial-temperature { --gauge-color: var(--amber); }
+.dial-pump { --gauge-color: var(--danger); }
+.gauge-needle {
+  stroke: var(--gauge-color, var(--cyan));
+  stroke-width: 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 2px var(--gauge-color, var(--cyan)));
+  transform-origin: 120px 142px;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+}
+.gauge-track,
+.gauge-progress {
+  fill: none;
+  stroke-linecap: round;
+}
+.gauge-track {
+  stroke: rgba(117, 218, 243, 0.14);
+  stroke-width: 12;
+}
+.gauge-progress {
+  stroke: var(--gauge-color, var(--cyan));
+  stroke-width: 12;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gauge-color, var(--cyan)) 42%, transparent));
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.gauge-ticks line {
+  stroke: rgba(237, 248, 244, 0.7);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.gauge-ticks line.major { stroke: var(--text); stroke-width: 2.4; }
+.gauge-pivot {
+  fill: var(--ink);
+  stroke: var(--gauge-color, var(--cyan));
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 3px var(--gauge-color, var(--cyan)));
+}
 
 .gauge-inner {
   position: relative;
@@ -317,16 +378,18 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 68%;
-  height: 68%;
-  padding: 10px;
+  width: 44%;
+  aspect-ratio: 1;
+  height: auto;
+  padding: 8px;
   border-radius: 50%;
-  background: rgba(4, 14, 14, 0.9);
-  border: 1px solid rgba(116, 171, 175, 0.18);
+  background: radial-gradient(circle, rgba(11, 29, 27, 0.98), rgba(2, 9, 8, 0.96) 72%);
+  border: 1px solid rgba(116, 171, 175, 0.24);
+  box-shadow: 0 0 0 5px rgba(2, 9, 8, 0.42), 0 0 22px rgba(0, 0, 0, 0.34);
   text-align: center;
 }
 .gauge-inner strong {
-  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
   line-height: 1;
   letter-spacing: -0.08em;
   white-space: nowrap;
@@ -381,6 +444,40 @@ a { color: inherit; text-decoration: none; }
   margin-top: 12px;
   margin-bottom: 14px;
 }
+
+.farm-visual {
+  display: grid;
+  grid-template-columns: 1fr 0.7fr;
+  gap: 12px;
+  align-items: end;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(9, 28, 24, 0.68), rgba(4, 14, 13, 0.84));
+}
+.farm-tower { display: grid; gap: 5px; }
+.farm-tower-label {
+  margin-bottom: 3px;
+  color: var(--cyan);
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+}
+.farm-layer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 4px 6px;
+  border: 1px solid rgba(122, 224, 171, 0.23);
+  border-radius: 5px;
+  background: rgba(122, 224, 171, 0.08);
+}
+.farm-layer b { width: 46px; color: var(--muted); font-size: 0.46rem; letter-spacing: 0.08em; }
+.farm-layer i { width: 8px; height: 8px; border-radius: 50% 50% 50% 0; background: var(--green); transform: rotate(45deg); }
+.rain-tank { display: grid; gap: 4px; align-content: center; justify-items: center; min-height: 88px; border: 1px solid rgba(117, 218, 243, 0.3); border-radius: 10px 10px 16px 16px; color: var(--cyan); font-size: 0.48rem; letter-spacing: 0.1em; text-align: center; }
+.rain-tank strong { color: var(--green); font-size: 1.3rem; line-height: 1; }
+.rain-tank em { color: var(--muted); font-size: 0.42rem; font-style: normal; }
 .node,
 .flow-arrow {
   font-size: 0.5rem;
@@ -498,7 +595,7 @@ a { color: inherit; text-decoration: none; }
 
 .bottom-grid {
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 .mini-chart {
@@ -512,6 +609,30 @@ a { color: inherit; text-decoration: none; }
   background: linear-gradient(180deg, rgba(6, 14, 14, 0.8), rgba(10, 21, 21, 0.95));
   border: 1px solid var(--line);
 }
+.chart-empty {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 5px;
+  height: 130px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: repeating-linear-gradient(0deg, transparent 0 31px, var(--grid) 32px), linear-gradient(180deg, rgba(6, 14, 14, 0.8), rgba(10, 21, 21, 0.95));
+}
+.chart-empty::after {
+  position: absolute;
+  width: 120%;
+  height: 1px;
+  content: "";
+  background: var(--line-strong);
+  transform: rotate(-10deg);
+  opacity: 0.5;
+}
+.chart-empty strong { color: var(--cyan); font-size: 0.58rem; letter-spacing: 0.13em; z-index: 1; }
+.chart-empty small { color: var(--muted); font-size: 0.48rem; letter-spacing: 0.08em; z-index: 1; }
+.chart-empty-soil strong { color: var(--green); }
 .chart-bar {
   display: block;
   width: 100%;

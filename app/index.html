@@ -37,6 +37,7 @@
         <section class="status-strip-panel" aria-label="System status overview">
           <div class="panel-header compact-header">
             <span class="card-label" data-i18n="systemStatus">SYSTEM STATUS</span>
+            <span class="panel-code">NODE / SF-ESP32-01</span>
           </div>
           <div class="hero-status" data-hero-status>
             <span class="status-dot"></span>
@@ -53,7 +54,13 @@
               <span class="meter-pulse"></span>
             </div>
             <div class="gauge dial-temperature">
-              <div class="gauge-ring" aria-hidden="true"></div>
+              <svg class="gauge-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <path class="gauge-track" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
+                <path class="gauge-progress" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
+                <g class="gauge-ticks"></g>
+                <line class="gauge-needle" x1="120" y1="142" x2="32" y2="142"></line>
+                <circle class="gauge-pivot" cx="120" cy="142" r="6"></circle>
+              </svg>
               <div class="gauge-inner">
                 <strong data-value="temperature">--</strong>
                 <small>°C</small>
@@ -68,7 +75,13 @@
               <span class="meter-pulse"></span>
             </div>
             <div class="gauge dial-humidity">
-              <div class="gauge-ring" aria-hidden="true"></div>
+              <svg class="gauge-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <path class="gauge-track" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
+                <path class="gauge-progress" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
+                <g class="gauge-ticks"></g>
+                <line class="gauge-needle" x1="120" y1="142" x2="32" y2="142"></line>
+                <circle class="gauge-pivot" cx="120" cy="142" r="6"></circle>
+              </svg>
               <div class="gauge-inner">
                 <strong data-value="humidity">--</strong>
                 <small>%</small>
@@ -83,8 +96,13 @@
               <span class="meter-pulse"></span>
             </div>
             <div class="gauge dial-soil">
-              <div class="gauge-ring"
-                aria-hidden="true"></div>
+              <svg class="gauge-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <path class="gauge-track" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
+                <path class="gauge-progress" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
+                <g class="gauge-ticks"></g>
+                <line class="gauge-needle" x1="120" y1="142" x2="32" y2="142"></line>
+                <circle class="gauge-pivot" cx="120" cy="142" r="6"></circle>
+              </svg>
               <div class="gauge-inner">
                 <strong data-value="soilMoisture">--</strong>
                 <small>%</small>
@@ -99,7 +117,13 @@
               <span class="meter-pulse"></span>
             </div>
             <div class="gauge dial-pump">
-              <div class="gauge-ring" aria-hidden="true"></div>
+              <svg class="gauge-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <path class="gauge-track" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
+                <path class="gauge-progress" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
+                <g class="gauge-ticks"></g>
+                <line class="gauge-needle" x1="120" y1="142" x2="32" y2="142"></line>
+                <circle class="gauge-pivot" cx="120" cy="142" r="6"></circle>
+              </svg>
               <div class="gauge-inner tank-status">
                 <strong data-pump-state>NOT CONNECTED</strong>
               </div>
@@ -135,6 +159,15 @@
               <div class="wire-item"><span>ESP32</span><span>→</span><span>OLED</span></div>
               <div class="wire-item"><span>ESP32</span><span>→</span><span>Blynk</span></div>
             </div>
+            <div class="farm-visual" aria-label="Multi-layer farming and rainwater harvesting visualization">
+              <div class="farm-tower">
+                <span class="farm-tower-label">MULTI-LAYER FARMING</span>
+                <div class="farm-layer"><b>LAYER 3</b><i></i><i></i><i></i></div>
+                <div class="farm-layer"><b>LAYER 2</b><i></i><i></i><i></i></div>
+                <div class="farm-layer"><b>LAYER 1</b><i></i><i></i><i></i></div>
+              </div>
+              <div class="rain-tank"><span>RAINWATER</span><strong>↘</strong><em>HARVEST</em></div>
+            </div>
           </article>
 
           <article class="panel control-panel">
@@ -148,8 +181,8 @@
             </div>
 
             <div class="pump-toggle-row" aria-label="Pump state controls">
-              <button type="button" class="pump-toggle is-selected" data-pump-toggle="ON">ON</button>
-              <button type="button" class="pump-toggle" data-pump-toggle="OFF">OFF</button>
+              <button type="button" class="pump-toggle" data-pump-toggle="ON">ON</button>
+              <button type="button" class="pump-toggle is-selected" data-pump-toggle="OFF">OFF</button>
             </div>
 
             <button class="pump-button" type="button" data-pump-command disabled>PUMP CONTROL UNAVAILABLE</button>
@@ -179,17 +212,38 @@
         </section>
 
         <section class="bottom-grid">
+          <article class="panel chart-panel telemetry-chart">
+            <div class="panel-header">
+              <span class="card-label">TEMPERATURE TREND</span>
+              <span class="chart-unit">°C / LIVE</span>
+            </div>
+            <div class="chart-empty" aria-label="Temperature trend chart awaiting history">
+              <span class="chart-line"></span><span class="chart-line"></span><span class="chart-line"></span>
+              <strong>LIVE STREAM</strong>
+              <small>HISTORY NOT AVAILABLE</small>
+            </div>
+          </article>
+
+          <article class="panel chart-panel telemetry-chart">
+            <div class="panel-header">
+              <span class="card-label">HUMIDITY TREND</span>
+              <span class="chart-unit">% / LIVE</span>
+            </div>
+            <div class="chart-empty" aria-label="Humidity trend chart awaiting history">
+              <span class="chart-line"></span><span class="chart-line"></span><span class="chart-line"></span>
+              <strong>LIVE STREAM</strong>
+              <small>HISTORY NOT AVAILABLE</small>
+            </div>
+          </article>
+
           <article class="panel chart-panel">
             <div class="panel-header">
               <span class="card-label" data-i18n="soilMoistureTrend">SOIL MOISTURE TREND</span>
+              <span class="chart-unit">% / SENSOR</span>
             </div>
-            <div class="mini-chart" aria-label="Soil moisture trend chart">
-              <div class="chart-bar" style="--h: 34%"></div>
-              <div class="chart-bar" style="--h: 44%"></div>
-              <div class="chart-bar" style="--h: 50%"></div>
-              <div class="chart-bar" style="--h: 58%"></div>
-              <div class="chart-bar" style="--h: 70%"></div>
-              <div class="chart-bar is-active" style="--h: 88%"></div>
+            <div class="chart-empty chart-empty-soil" aria-label="Soil moisture trend unavailable without a real sensor reading">
+              <strong>NO SENSOR DATA</strong>
+              <small>HISTORY WILL APPEAR WHEN HW-080 REPORTS</small>
             </div>
             <div class="chart-caption" data-trend>UNAVAILABLE</div>
           </article>
