@@ -19,7 +19,7 @@
         </div>
 
         <div class="topbar-actions">
-          <a class="project-info-link" href="/Smart-Farming-IoT/" data-i18n="projectInfo">PROJECT INFO</a>
+          <a class="project-info-link" href="../" data-i18n="projectInfo">PROJECT INFO</a>
 
           <div class="lang-toggle" aria-label="Language selector">
             <button type="button" class="lang-btn is-active" data-lang="en">EN</button>
@@ -133,43 +133,6 @@
         </section>
 
         <section class="detail-grid">
-          <article class="panel system-panel">
-            <div class="panel-header">
-              <span class="card-label" data-i18n="waterSystem">WATER SYSTEM</span>
-              <span class="badge-state state-neutral" data-requirement>UNAVAILABLE</span>
-            </div>
-
-            <div class="system-flow">
-              <div class="node">RAINWATER</div>
-              <div class="flow-arrow">↓</div>
-              <div class="node">STORAGE</div>
-              <div class="flow-arrow">↓</div>
-              <div class="node">PUMP</div>
-              <div class="flow-arrow">↓</div>
-              <div class="node">RELAY</div>
-              <div class="flow-arrow">↓</div>
-              <div class="node pipe-node">TRANSPARENT PIPE</div>
-              <div class="flow-arrow">↓</div>
-              <div class="node farm-node">3-LAYER FARM</div>
-            </div>
-
-            <div class="wire-list">
-              <div class="wire-item"><span>SOIL SENSOR</span><span>→</span><span>ESP32</span></div>
-              <div class="wire-item"><span>DHT11</span><span>→</span><span>ESP32</span></div>
-              <div class="wire-item"><span>ESP32</span><span>→</span><span>OLED</span></div>
-              <div class="wire-item"><span>ESP32</span><span>→</span><span>Blynk</span></div>
-            </div>
-            <div class="farm-visual" aria-label="Multi-layer farming and rainwater harvesting visualization">
-              <div class="farm-tower">
-                <span class="farm-tower-label">MULTI-LAYER FARMING</span>
-                <div class="farm-layer"><b>LAYER 3</b><i></i><i></i><i></i></div>
-                <div class="farm-layer"><b>LAYER 2</b><i></i><i></i><i></i></div>
-                <div class="farm-layer"><b>LAYER 1</b><i></i><i></i><i></i></div>
-              </div>
-              <div class="rain-tank"><span>RAINWATER</span><strong>↘</strong><em>HARVEST</em></div>
-            </div>
-          </article>
-
           <article class="panel control-panel">
             <div class="panel-header">
               <span class="card-label" data-i18n="pumpControl">PUMP CONTROL</span>
@@ -217,10 +180,8 @@
               <span class="card-label">TEMPERATURE TREND</span>
               <span class="chart-unit">°C / LIVE</span>
             </div>
-            <div class="chart-empty" aria-label="Temperature trend chart awaiting history">
-              <span class="chart-line"></span><span class="chart-line"></span><span class="chart-line"></span>
-              <strong>LIVE STREAM</strong>
-              <small>HISTORY NOT AVAILABLE</small>
+            <div class="mini-chart" data-chart="temperature" aria-label="Live temperature trend">
+              <span class="trend-placeholder">WAITING FOR SENSOR DATA</span>
             </div>
           </article>
 
@@ -229,10 +190,8 @@
               <span class="card-label">HUMIDITY TREND</span>
               <span class="chart-unit">% / LIVE</span>
             </div>
-            <div class="chart-empty" aria-label="Humidity trend chart awaiting history">
-              <span class="chart-line"></span><span class="chart-line"></span><span class="chart-line"></span>
-              <strong>LIVE STREAM</strong>
-              <small>HISTORY NOT AVAILABLE</small>
+            <div class="mini-chart" data-chart="humidity" aria-label="Live humidity trend">
+              <span class="trend-placeholder">WAITING FOR SENSOR DATA</span>
             </div>
           </article>
 
@@ -241,41 +200,12 @@
               <span class="card-label" data-i18n="soilMoistureTrend">SOIL MOISTURE TREND</span>
               <span class="chart-unit">% / SENSOR</span>
             </div>
-            <div class="chart-empty chart-empty-soil" aria-label="Soil moisture trend unavailable without a real sensor reading">
-              <strong>NO SENSOR DATA</strong>
-              <small>HISTORY WILL APPEAR WHEN HW-080 REPORTS</small>
+            <div class="mini-chart" data-chart="soilMoisture" aria-label="Live soil moisture trend">
+              <span class="trend-placeholder">WAITING FOR SENSOR DATA</span>
             </div>
             <div class="chart-caption" data-trend>UNAVAILABLE</div>
           </article>
 
-          <article class="panel adaptive-panel">
-            <div class="panel-header">
-              <span class="card-label" data-i18n="adaptiveIrrigation">ADAPTIVE IRRIGATION</span>
-            </div>
-            <div class="adaptive-flow">
-              <span data-i18n="soilMoisture">SOIL MOISTURE</span>
-              <span>↓</span>
-              <span data-i18n="temperature">TEMPERATURE</span>
-              <span>↓</span>
-              <span data-i18n="humidity">HUMIDITY</span>
-              <span>↓</span>
-              <span data-i18n="season">SEASON</span>
-              <span>↓</span>
-              <span data-i18n="cropProfile">CROP PROFILE</span>
-              <span>↓</span>
-              <span data-i18n="moistureTrend">MOISTURE TREND</span>
-              <span>↓</span>
-              <strong data-i18n="adaptiveDecision">ADAPTIVE DECISION</strong>
-              <span>↓</span>
-              <strong data-i18n="irrigationRequired">IRRIGATION REQUIRED?</strong>
-              <span>↓</span>
-              <strong>ESP32 → RELAY → PUMP</strong>
-            </div>
-            <div class="requirement-row">
-              <span data-i18n="requirement">REQUIREMENT</span>
-              <strong data-requirement-copy>UNAVAILABLE</strong>
-            </div>
-          </article>
         </section>
 
         <section class="component-panel panel" aria-label="System components">

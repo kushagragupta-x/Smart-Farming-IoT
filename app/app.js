@@ -3,6 +3,7 @@ const BLYNK_API_BASE = "https://blynk.cloud/external/api";
 const BLYNK_VIRTUAL_PINS = {
   temperature: "V1",
   humidity: "V2",
+  soilMoisture: "V4",
 };
 
 const translations = {
@@ -124,6 +125,12 @@ const systemState = {
   language: localStorage.getItem("smartFarmLang") || "en",
 };
 
+const sensorHistory = {
+  temperature: [],
+  humidity: [],
+  soilMoisture: [],
+};
+
 const elements = {
   connectionLabel: document.querySelector("[data-connection-label]"),
   connectionBadge: document.querySelector("[data-connection-badge]"),
@@ -237,6 +244,43 @@ function updateMeterProgress() {
   renderGauge(".dial-humidity", humidityValue, 0, 100, humidityValue !== null);
   renderGauge(".dial-temperature", temperatureValue, 0, 60, temperatureValue !== null);
   renderGauge(".dial-pump", systemState.pumpCommand === "ON" ? 100 : 0, 0, 100, systemState.esp32Online);
+}
+
+function updateTrendHistory() {
+  Object.entries({
+    temperature: systemState.temperature,
+    humidity: systemState.humidity,
+    soilMoisture: systemState.soilMoisture,
+  }).forEach(([key, value]) => {
+    if (typeof value !== "number" || !Number.isFinite(value)) return;
+    sensorHistory[key].push(value);
+    if (sensorHistory[key].length > 24) sensorHistory[key].shift();
+  });
+}
+
+function renderTrendCharts() {
+  const chartRanges = {
+    temperature: [0, 60],
+    humidity: [0, 100],
+    soilMoisture: [0, 100],
+  };
+
+  Object.entries(chartRanges).forEach(([key, [min, max]]) => {
+    const chart = document.querySelector(`[data-chart="${key}"]`);
+    if (!chart) return;
+
+    const values = sensorHistory[key];
+    if (!values.length) {
+      chart.innerHTML = '<span class="trend-placeholder">WAITING FOR SENSOR DATA</span>';
+      return;
+    }
+
+    chart.innerHTML = values.map((value, index) => {
+      const height = Math.max(12, ((value - min) / (max - min)) * 100);
+      const activeClass = index === values.length - 1 ? " is-active" : "";
+      return `<span class="chart-bar${activeClass}" style="--h: ${height}%" title="${value}"></span>`;
+    }).join("");
+  });
 }
 
 function updateLanguage() {
@@ -430,6 +474,7 @@ function renderSystemState() {
   const selectedComponent = document.querySelector(".component-item.is-selected")?.dataset.component || "esp32";
   updateComponentInfo(selectedComponent);
   updateMeterProgress();
+  renderTrendCharts();
 }
 
 async function getSystemStatus() {
@@ -471,13 +516,14 @@ async function refreshHardwareStatus() {
 
   try {
     console.log("[POLL] refreshHardwareStatus start");
-    const [status, temperatureValue, humidityValue] = await Promise.all([
+    const [status, temperatureValue, humidityValue, soilMoistureValue] = await Promise.all([
       getSystemStatus(),
       getBlynkPinValue(BLYNK_VIRTUAL_PINS.temperature),
       getBlynkPinValue(BLYNK_VIRTUAL_PINS.humidity),
+      getBlynkPinValue(BLYNK_VIRTUAL_PINS.soilMoisture),
     ]);
 
-    console.log("[POLL] temperatureValue:", temperatureValue, "humidityValue:", humidityValue, "esp32Online:", Boolean(status && status.online));
+    console.log("[POLL] temperatureValue:", temperatureValue, "humidityValue:", humidityValue, "soilMoistureValue:", soilMoistureValue, "esp32Online:", Boolean(status && status.online));
 
     const connected = Boolean(status && status.online);
     systemState.esp32Online = connected;
@@ -492,7 +538,8 @@ async function refreshHardwareStatus() {
     } else {
       systemState.temperature = typeof temperatureValue === "number" ? Number(temperatureValue) : null;
       systemState.humidity = typeof humidityValue === "number" ? Number(humidityValue) : null;
-      systemState.soilMoisture = typeof systemState.soilMoisture === "number" ? systemState.soilMoisture : null;
+      systemState.soilMoisture = typeof soilMoistureValue === "number" ? Number(soilMoistureValue) : null;
+      updateTrendHistory();
     }
 
     renderSystemState();
