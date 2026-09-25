@@ -1,10 +1,19 @@
 ﻿const BLYNK_AUTH_TOKEN = "IMz1W97RnK2l9Y_cGsoBEzPGsKr1jQt-";
 const BLYNK_API_BASE = "https://blynk.cloud/external/api";
 const BLYNK_VIRTUAL_PINS = {
+  pump: "V0",
   temperature: "V1",
   humidity: "V2",
+  mode: "V5",
+  season: "V6",
+  cropProfile: "V7",
+  customMoisture: "V8",
   soilMoisture: "V4",
 };
+const BLYNK_REQUEST_TIMEOUT_MS = 8000;
+let refreshInProgress = false;
+let pumpCommandInFlight = false;
+let pumpCommandVersion = 0;
 
 const translations = {
   en: {
@@ -120,6 +129,7 @@ const systemState = {
   irrigationRequirement: null,
   season: "SUMMER",
   cropProfile: "GENERAL CROPS",
+  customMoisture: null,
   statusState: "CHECKING",
   pumpCommand: "OFF",
   language: localStorage.getItem("smartFarmLang") || "en",
@@ -160,27 +170,55 @@ function setText(selector, value) {
   });
 }
 
-async function getBlynkPinValue(pinName) {
-  const response = await fetch(`${BLYNK_API_BASE}/get?token=${encodeURIComponent(BLYNK_AUTH_TOKEN)}&${pinName}`, { cache: "no-store" });
+function assertBlynkToken() {
+  if (!BLYNK_AUTH_TOKEN || BLYNK_AUTH_TOKEN.includes("YOUR_")) {
+    throw new Error("Blynk auth token is not configured for direct client access.");
+  }
+}
 
-  if (!response.ok) {
-    throw new Error(`Unable to reach Blynk pin ${pinName}.`);
+async function blynkRequest(path, options = {}) {
+  assertBlynkToken();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), BLYNK_REQUEST_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${BLYNK_API_BASE}${path}`, {
+      ...options,
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    const text = await response.text();
+    if (!response.ok) {
+      throw new Error(`Blynk API returned HTTP ${response.status}.`);
+    }
+    return text.trim();
+  } catch (error) {
+    if (error.name === "AbortError") throw new Error("Blynk request timed out.");
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function getBlynkValue(pin) {
+  const text = await blynkRequest(`/get?token=${encodeURIComponent(BLYNK_AUTH_TOKEN)}&${pin}`);
+  if (!text || text === "null" || text === "undefined") {
+    throw new Error(`Blynk returned no value for ${pin}.`);
   }
 
-  const text = await response.text();
-  const cleaned = String(text).trim();
+  const valueText = String(text).replace(/[\[\]"]/g, "").split(",")[0].trim();
+  if (!valueText) throw new Error(`Blynk returned an invalid value for ${pin}.`);
+  const value = Number(valueText);
+  if (!Number.isFinite(value)) throw new Error(`Blynk returned an invalid value for ${pin}.`);
+  return value;
+}
 
-  console.log(`[BLYNK ${pinName}] raw response:`, text);
-
-  if (!cleaned || cleaned === "null" || cleaned === "undefined") {
-    console.log(`[BLYNK ${pinName}] parsed value:`, null);
-    return null;
+async function setBlynkValue(pin, value) {
+  const text = await blynkRequest(`/update?token=${encodeURIComponent(BLYNK_AUTH_TOKEN)}&${pin}=${encodeURIComponent(value)}`);
+  if (text && !["ok", "200", "200 ok", "{}"].includes(text.toLowerCase())) {
+    throw new Error(`Blynk rejected the update for ${pin}.`);
   }
-
-  const numericValue = Number(cleaned);
-  const resolvedValue = Number.isFinite(numericValue) ? numericValue : null;
-  console.log(`[BLYNK ${pinName}] parsed value:`, resolvedValue);
-  return resolvedValue;
+  return value;
 }
 
 const GAUGE_GEOMETRY = {
@@ -425,7 +463,7 @@ function renderSystemState() {
   }
   if (elements.pumpReadout) elements.pumpReadout.textContent = systemState.esp32Online ? (systemState.pumpCommand === "ON" ? "PUMP ACTIVE" : "PUMP READY") : "SYSTEM OFFLINE";
 
-  const pumpDisabled = !systemState.esp32Online || isChecking || isConnectionError;
+  const pumpDisabled = !systemState.esp32Online || isChecking || isConnectionError || pumpCommandInFlight || systemState.irrigationMode !== "MANUAL";
   if (elements.pumpButton) {
     elements.pumpButton.disabled = pumpDisabled;
     elements.pumpButton.textContent = isChecking ? "CHECKING..." : isConnectionError ? "CONNECTION ERROR" : systemState.esp32Online ? (systemState.pumpCommand === "ON" ? "PUMP ON" : "PUMP OFF") : "PUMP CONTROL UNAVAILABLE";
@@ -461,13 +499,18 @@ function renderSystemState() {
 
   document.querySelectorAll("[data-mode]").forEach((button) => {
     button.classList.toggle("is-selected", button.dataset.mode === systemState.irrigationMode);
+    button.disabled = !systemState.esp32Online || isChecking || isConnectionError;
   });
 
   document.querySelectorAll("[data-setting]").forEach((group) => {
     const targetKey = group.dataset.setting;
     const activeValue = targetKey === "season" ? systemState.season : systemState.cropProfile;
     group.querySelectorAll("[data-choice]").forEach((button) => {
-      button.classList.toggle("is-selected", button.dataset.choice === activeValue);
+      const isSelected = targetKey === "season"
+        ? button.dataset.choice === activeValue
+        : cropChoiceToPin(button.dataset.choice) === cropProfileToPin(activeValue);
+      button.classList.toggle("is-selected", isSelected);
+      button.disabled = !systemState.esp32Online || isChecking || isConnectionError;
     });
   });
 
@@ -478,16 +521,7 @@ function renderSystemState() {
 }
 
 async function getSystemStatus() {
-  if (!BLYNK_AUTH_TOKEN) {
-    throw new Error("Blynk auth token is not configured for direct client access.");
-  }
-
-  const response = await fetch(`${BLYNK_API_BASE}/isHardwareConnected?token=${encodeURIComponent(BLYNK_AUTH_TOKEN)}`, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("Unable to reach Blynk hardware status endpoint.");
-  }
-
-  const text = await response.text();
+  const text = await blynkRequest(`/isHardwareConnected?token=${encodeURIComponent(BLYNK_AUTH_TOKEN)}`);
   const normalized = String(text).trim();
   const online = normalized === "1" || normalized === "true" || normalized.toLowerCase() === "online";
 
@@ -498,32 +532,71 @@ async function getSystemStatus() {
   };
 }
 
+const CROP_PROFILE_VALUES = {
+  "GENERAL CROPS": 0,
+  "LEAFY PLANTS": 1,
+  "VEGETABLES": 2,
+  CUSTOM: 3,
+  "VEGETABLE": 4,
+};
+
+function cropChoiceToPin(choice) {
+  return CROP_PROFILE_VALUES[choice] ?? 0;
+}
+
+function cropProfileToPin(profile) {
+  return cropChoiceToPin(profile);
+}
+
+function pinToCropProfile(value) {
+  return value === 1 ? "LEAFY PLANTS" : value === 2 || value === 4 ? "VEGETABLES" : value === 3 ? "CUSTOM" : "GENERAL CROPS";
+}
+
+async function updateAllBlynkValues() {
+  const values = await Promise.all(Object.entries(BLYNK_VIRTUAL_PINS).map(async ([name, pin]) => [name, await getBlynkValue(pin)]));
+  return Object.fromEntries(values);
+}
+
 async function setIrrigationMode(mode) {
-  systemState.irrigationMode = mode;
+  await setBlynkValue(BLYNK_VIRTUAL_PINS.mode, mode === "AUTO" ? 1 : 0);
+  const confirmedMode = await getBlynkValue(BLYNK_VIRTUAL_PINS.mode);
+  systemState.irrigationMode = confirmedMode === 1 ? "AUTO" : "MANUAL";
+  console.log(systemState.irrigationMode === "AUTO" ? "MODE -> AUTOMATIC" : "MODE -> MANUAL");
   renderSystemState();
-  return mode;
+  return systemState.irrigationMode;
 }
 
 async function setPumpCommand(command) {
-  systemState.pumpCommand = command;
+  if (systemState.irrigationMode !== "MANUAL") {
+    console.log("IGNORED: manual pump control is disabled in automatic mode");
+    return false;
+  }
+  pumpCommandInFlight = true;
+  const commandVersion = ++pumpCommandVersion;
   renderSystemState();
-  return command;
+  try {
+    await setBlynkValue(BLYNK_VIRTUAL_PINS.pump, command === "ON" ? 1 : 0);
+    const confirmedPump = await getBlynkValue(BLYNK_VIRTUAL_PINS.pump);
+    if (commandVersion === pumpCommandVersion) {
+      systemState.pumpCommand = confirmedPump === 1 ? "ON" : "OFF";
+      console.log(`PUMP COMMAND -> ${systemState.pumpCommand}`);
+      renderSystemState();
+    }
+    return systemState.pumpCommand;
+  } finally {
+    pumpCommandInFlight = false;
+  }
 }
 
 async function refreshHardwareStatus() {
+  if (refreshInProgress || pumpCommandInFlight) return;
+  refreshInProgress = true;
+  const refreshPumpVersion = pumpCommandVersion;
   systemState.statusState = "CHECKING";
   renderSystemState();
 
   try {
-    console.log("[POLL] refreshHardwareStatus start");
-    const [status, temperatureValue, humidityValue, soilMoistureValue] = await Promise.all([
-      getSystemStatus(),
-      getBlynkPinValue(BLYNK_VIRTUAL_PINS.temperature),
-      getBlynkPinValue(BLYNK_VIRTUAL_PINS.humidity),
-      getBlynkPinValue(BLYNK_VIRTUAL_PINS.soilMoisture),
-    ]);
-
-    console.log("[POLL] temperatureValue:", temperatureValue, "humidityValue:", humidityValue, "soilMoistureValue:", soilMoistureValue, "esp32Online:", Boolean(status && status.online));
+    const [status, values] = await Promise.all([getSystemStatus(), updateAllBlynkValues()]);
 
     const connected = Boolean(status && status.online);
     systemState.esp32Online = connected;
@@ -536,14 +609,22 @@ async function refreshHardwareStatus() {
       systemState.temperature = null;
       systemState.humidity = null;
     } else {
-      systemState.temperature = typeof temperatureValue === "number" ? Number(temperatureValue) : null;
-      systemState.humidity = typeof humidityValue === "number" ? Number(humidityValue) : null;
-      systemState.soilMoisture = typeof soilMoistureValue === "number" ? Number(soilMoistureValue) : null;
+      systemState.temperature = values.temperature;
+      systemState.humidity = values.humidity;
+      systemState.soilMoisture = values.soilMoisture;
+      if (refreshPumpVersion === pumpCommandVersion) {
+        systemState.pumpCommand = values.pump === 1 ? "ON" : "OFF";
+      }
+      systemState.irrigationMode = values.mode === 1 ? "AUTO" : "MANUAL";
+      systemState.season = values.season === 1 ? "WINTER" : "SUMMER";
+      systemState.cropProfile = pinToCropProfile(values.cropProfile);
+      systemState.customMoisture = values.customMoisture;
       updateTrendHistory();
     }
 
     renderSystemState();
   } catch (error) {
+    console.error("[BLYNK] refresh failed:", error);
     systemState.esp32Online = false;
     systemState.wifiConnected = false;
     systemState.cloudConnected = false;
@@ -554,24 +635,28 @@ async function refreshHardwareStatus() {
     systemState.moistureTrend = null;
     systemState.statusState = "CONNECTION ERROR";
     renderSystemState();
+  } finally {
+    refreshInProgress = false;
   }
 }
 
 function beginHardwareStatusPolling() {
   refreshHardwareStatus();
-  setInterval(refreshHardwareStatus, 5000);
+  setInterval(refreshHardwareStatus, 2000);
 }
 
 function bindControls() {
   document.querySelectorAll("[data-mode]").forEach((button) => {
     button.addEventListener("click", async () => {
       const mode = button.dataset.mode;
-      await setIrrigationMode(mode);
-      if (elements.commandMessage) {
-        const message = systemState.esp32Online
-          ? `${mode} selected locally. Hardware remains online and ready.`
-          : "ESP32 is offline. Pump controls are disabled.";
-        elements.commandMessage.textContent = message;
+      if (!systemState.esp32Online) return;
+      try {
+        await setIrrigationMode(mode);
+        if (elements.commandMessage) elements.commandMessage.textContent = `${mode} synchronized with ESP32.`;
+      } catch (error) {
+        console.error("[BLYNK] mode update failed:", error);
+        systemState.statusState = "CONNECTION ERROR";
+        renderSystemState();
       }
     });
   });
@@ -579,41 +664,65 @@ function bindControls() {
   document.querySelectorAll("[data-pump-toggle]").forEach((button) => {
     button.addEventListener("click", async () => {
       const command = button.dataset.pumpToggle;
+      if (systemState.irrigationMode !== "MANUAL") {
+        console.log("IGNORED: manual pump control is disabled in automatic mode");
+        return;
+      }
       if (!systemState.esp32Online) {
         if (elements.commandMessage) elements.commandMessage.textContent = "ESP32 is offline. Pump controls are disabled.";
         return;
       }
-      await setPumpCommand(command);
-      if (elements.commandMessage) {
-        elements.commandMessage.textContent = `Pump set to ${command}. Local control state updated.`;
+      try {
+        await setPumpCommand(command);
+        if (elements.commandMessage) elements.commandMessage.textContent = `Pump set to ${command}. ESP32 state confirmed.`;
+      } catch (error) {
+        console.error("[BLYNK] pump update failed:", error);
+        systemState.statusState = "CONNECTION ERROR";
+        renderSystemState();
       }
     });
   });
 
   document.querySelectorAll("[data-pump-command]").forEach((button) => {
     button.addEventListener("click", async () => {
+      if (systemState.irrigationMode !== "MANUAL") {
+        console.log("IGNORED: manual pump control is disabled in automatic mode");
+        return;
+      }
       if (!systemState.esp32Online) {
         if (elements.commandMessage) elements.commandMessage.textContent = "ESP32 is offline. Pump controls are disabled.";
         return;
       }
       const nextCommand = systemState.pumpCommand === "ON" ? "OFF" : "ON";
-      await setPumpCommand(nextCommand);
-      if (elements.commandMessage) {
-        elements.commandMessage.textContent = `Pump toggled to ${nextCommand}. Local control state updated.`;
+      try {
+        await setPumpCommand(nextCommand);
+        if (elements.commandMessage) elements.commandMessage.textContent = `Pump toggled to ${nextCommand}. ESP32 state confirmed.`;
+      } catch (error) {
+        console.error("[BLYNK] pump update failed:", error);
+        systemState.statusState = "CONNECTION ERROR";
+        renderSystemState();
       }
     });
   });
 
   document.querySelectorAll("[data-setting]").forEach((group) => {
     group.querySelectorAll("[data-choice]").forEach((button) => {
-      button.addEventListener("click", () => {
+      button.addEventListener("click", async () => {
+        if (!systemState.esp32Online) return;
         const nextValue = button.dataset.choice;
-        if (group.dataset.setting === "season") {
-          systemState.season = nextValue;
-        } else {
-          systemState.cropProfile = nextValue;
+        const pin = group.dataset.setting === "season" ? BLYNK_VIRTUAL_PINS.season : BLYNK_VIRTUAL_PINS.cropProfile;
+        const value = group.dataset.setting === "season"
+          ? nextValue === "WINTER" ? 1 : 0
+          : cropChoiceToPin(nextValue);
+        try {
+          await setBlynkValue(pin, value);
+          await refreshHardwareStatus();
+          if (elements.commandMessage) elements.commandMessage.textContent = "Setting synchronized with ESP32.";
+        } catch (error) {
+          console.error("[BLYNK] setting update failed:", error);
+          systemState.statusState = "CONNECTION ERROR";
+          renderSystemState();
         }
-        renderSystemState();
       });
     });
   });
