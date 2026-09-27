@@ -174,6 +174,20 @@ function setText(selector, value) {
   });
 }
 
+function applyCustomMoistureValue(value) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return;
+
+  const normalizedValue = Math.min(100, Math.max(0, numericValue));
+  systemState.customMoisture = normalizedValue;
+  const slider = document.getElementById("customMoistureSlider");
+  const display = document.querySelector("[data-custom-moisture-value]");
+  if (slider?.matches(":active")) return;
+  if (slider) slider.value = String(normalizedValue);
+  if (display) display.textContent = `${normalizedValue}%`;
+  console.log("CUSTOM MOISTURE UI UPDATED:", normalizedValue);
+}
+
 function assertBlynkToken() {
   if (!BLYNK_AUTH_TOKEN || BLYNK_AUTH_TOKEN.includes("YOUR_")) {
     throw new Error("Blynk auth token is not configured for direct client access.");
@@ -649,10 +663,12 @@ async function refreshHardwareStatus(showChecking = true) {
       }
       lastSyncedCropProfile = values.cropProfile;
       systemState.cropProfile = pinToCropProfile(values.cropProfile);
-      if (!customMoistureWriteInFlight && refreshCustomMoistureVersion === customMoistureCommandVersion) {
-        systemState.customMoisture = values.customMoisture;
-      }
       updateTrendHistory();
+    }
+
+    console.log("BLYNK V8 READ:", values.customMoisture);
+    if (!customMoistureWriteInFlight && refreshCustomMoistureVersion === customMoistureCommandVersion) {
+      applyCustomMoistureValue(values.customMoisture);
     }
 
     renderSystemState();
@@ -776,6 +792,7 @@ function bindControls() {
       const value = Number(customMoistureSlider.value);
       systemState.customMoisture = value;
       if (customMoistureValue) customMoistureValue.textContent = `${value}%`;
+      console.log("CUSTOM MOISTURE UI UPDATED:", value);
     });
     customMoistureSlider.addEventListener("change", async () => {
       if (!systemState.esp32Online) return;
@@ -783,6 +800,7 @@ function bindControls() {
       customMoistureCommandVersion += 1;
       customMoistureWriteInFlight = true;
       try {
+        console.log("BLYNK V8 WRITE:", value);
         await setBlynkValue(BLYNK_VIRTUAL_PINS.customMoisture, value);
         if (elements.commandMessage) elements.commandMessage.textContent = `Custom moisture set to ${value}%.`;
       } catch (error) {
