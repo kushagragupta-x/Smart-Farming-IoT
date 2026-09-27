@@ -14,7 +14,8 @@ const BLYNK_REQUEST_TIMEOUT_MS = 8000;
 let refreshInProgress = false;
 let pumpCommandInFlight = false;
 let pumpCommandVersion = 0;
-let lastSyncedCropProfile = null;
+let cropProfileCommandVersion = 0;
+let cropProfileWriteInFlight = false;
 let customMoistureWriteInFlight = false;
 let customMoistureCommandVersion = 0;
 
@@ -576,6 +577,7 @@ const CROP_PROFILE_VALUES = {
   "GENERAL CROPS": 0,
   "LEAFY PLANTS": 1,
   "VEGETABLES": 2,
+  CUSTOM: 3,
 };
 
 function cropChoiceToPin(choice) {
@@ -587,7 +589,7 @@ function cropProfileToPin(profile) {
 }
 
 function pinToCropProfile(value) {
-  return value === 1 ? "LEAFY PLANTS" : value === 2 ? "VEGETABLES" : "GENERAL CROPS";
+  return value === 1 ? "LEAFY PLANTS" : value === 2 ? "VEGETABLES" : value === 3 ? "CUSTOM" : "GENERAL CROPS";
 }
 
 async function updateAllBlynkValues() {
@@ -630,6 +632,7 @@ async function refreshHardwareStatus(showChecking = true) {
   if (refreshInProgress || pumpCommandInFlight) return;
   refreshInProgress = true;
   const refreshPumpVersion = pumpCommandVersion;
+  const refreshCropProfileVersion = cropProfileCommandVersion;
   const refreshCustomMoistureVersion = customMoistureCommandVersion;
   if (showChecking) {
     systemState.statusState = "CHECKING";
@@ -638,6 +641,7 @@ async function refreshHardwareStatus(showChecking = true) {
 
   try {
     const [status, values] = await Promise.all([getSystemStatus(), updateAllBlynkValues()]);
+    console.log(`BLYNK V7 READ: ${values.cropProfile}`);
 
     const connected = Boolean(status && status.online);
     systemState.esp32Online = connected;
@@ -658,11 +662,11 @@ async function refreshHardwareStatus(showChecking = true) {
       }
       systemState.irrigationMode = values.mode === 1 ? "AUTO" : "MANUAL";
       systemState.season = values.season === 1 ? "WINTER" : "SUMMER";
-      if (lastSyncedCropProfile !== null && values.cropProfile !== lastSyncedCropProfile) {
-        systemState.customProfileSelected = false;
+      if (!cropProfileWriteInFlight && refreshCropProfileVersion === cropProfileCommandVersion) {
+        systemState.customProfileSelected = values.cropProfile === 3;
+        systemState.cropProfile = pinToCropProfile(values.cropProfile);
+        console.log(`ACTIVE CROP: ${systemState.cropProfile}`);
       }
-      lastSyncedCropProfile = values.cropProfile;
-      systemState.cropProfile = pinToCropProfile(values.cropProfile);
       updateTrendHistory();
     }
 
@@ -757,26 +761,35 @@ function bindControls() {
   document.querySelectorAll("[data-setting]").forEach((group) => {
     group.querySelectorAll("[data-choice]").forEach((button) => {
       button.addEventListener("click", async () => {
-        if (!systemState.esp32Online) return;
         const nextValue = button.dataset.choice;
-        if (group.dataset.setting === "crop" && nextValue === "CUSTOM") {
-          systemState.customProfileSelected = true;
-          renderSystemState();
-          return;
-        }
+        const isCustomCrop = group.dataset.setting === "crop" && nextValue === "CUSTOM";
+        if (isCustomCrop) console.log("CUSTOM BUTTON CLICKED");
+        if (!systemState.esp32Online) return;
         const pin = group.dataset.setting === "season" ? BLYNK_VIRTUAL_PINS.season : BLYNK_VIRTUAL_PINS.cropProfile;
         const value = group.dataset.setting === "season"
           ? nextValue === "WINTER" ? 1 : 0
           : cropChoiceToPin(nextValue);
         try {
           if (group.dataset.setting === "crop") {
-            systemState.customProfileSelected = false;
+            cropProfileCommandVersion += 1;
+            cropProfileWriteInFlight = true;
+            systemState.customProfileSelected = nextValue === "CUSTOM";
             renderSystemState();
           }
+          if (isCustomCrop) console.log(`ABOUT TO WRITE: V7 = ${value}`);
           await setBlynkValue(pin, value);
+          if (group.dataset.setting === "crop") {
+            console.log(isCustomCrop ? "BLYNK CROP WRITE COMPLETE" : `BLYNK CROP WRITE COMPLETE: V7 = ${value}`);
+            cropProfileCommandVersion += 1;
+            cropProfileWriteInFlight = false;
+          }
           await refreshHardwareStatus();
           if (elements.commandMessage) elements.commandMessage.textContent = "Setting synchronized with ESP32.";
         } catch (error) {
+          if (group.dataset.setting === "crop") {
+            cropProfileCommandVersion += 1;
+            cropProfileWriteInFlight = false;
+          }
           console.error("[BLYNK] setting update failed:", error);
           systemState.statusState = "CONNECTION ERROR";
           renderSystemState();
