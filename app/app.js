@@ -612,13 +612,15 @@ async function setPumpCommand(command) {
   }
 }
 
-async function refreshHardwareStatus() {
+async function refreshHardwareStatus(showChecking = true) {
   if (refreshInProgress || pumpCommandInFlight) return;
   refreshInProgress = true;
   const refreshPumpVersion = pumpCommandVersion;
   const refreshCustomMoistureVersion = customMoistureCommandVersion;
-  systemState.statusState = "CHECKING";
-  renderSystemState();
+  if (showChecking) {
+    systemState.statusState = "CHECKING";
+    renderSystemState();
+  }
 
   try {
     const [status, values] = await Promise.all([getSystemStatus(), updateAllBlynkValues()]);
@@ -673,7 +675,7 @@ async function refreshHardwareStatus() {
 
 function beginHardwareStatusPolling() {
   refreshHardwareStatus();
-  setInterval(refreshHardwareStatus, 2000);
+  setInterval(() => refreshHardwareStatus(false), 1000);
 }
 
 function bindControls() {
