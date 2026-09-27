@@ -751,7 +751,10 @@ function bindControls() {
           ? nextValue === "WINTER" ? 1 : 0
           : cropChoiceToPin(nextValue);
         try {
-          if (group.dataset.setting === "crop") systemState.customProfileSelected = false;
+          if (group.dataset.setting === "crop") {
+            systemState.customProfileSelected = false;
+            renderSystemState();
+          }
           await setBlynkValue(pin, value);
           await refreshHardwareStatus();
           if (elements.commandMessage) elements.commandMessage.textContent = "Setting synchronized with ESP32.";
