@@ -599,7 +599,7 @@ a { color: inherit; text-decoration: none; }
   transition: max-height 0.28s ease, margin-top 0.28s ease, opacity 0.2s ease, visibility 0s linear 0.28s;
 }
 .custom-moisture-panel.is-expanded {
-  max-height: 120px;
+  max-height: 180px;
   margin-top: 8px;
   opacity: 1;
   visibility: visible;
@@ -628,6 +628,12 @@ a { color: inherit; text-decoration: none; }
   color: var(--green);
   font-size: 0.82rem;
   font-weight: 800;
+}
+.custom-moisture-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.4;
 }
 .custom-moisture-control input[type="range"] {
   width: 100%;
