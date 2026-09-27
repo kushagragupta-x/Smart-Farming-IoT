@@ -590,6 +590,59 @@ a { color: inherit; text-decoration: none; }
 .choice-grid button[data-choice="GENERAL CROPS"] {
   grid-column: span 1;
 }
+.custom-moisture-panel {
+  max-height: 0;
+  margin-top: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: max-height 0.28s ease, margin-top 0.28s ease, opacity 0.2s ease, visibility 0s linear 0.28s;
+}
+.custom-moisture-panel.is-expanded {
+  max-height: 120px;
+  margin-top: 8px;
+  opacity: 1;
+  visibility: visible;
+  transition: max-height 0.28s ease, margin-top 0.28s ease, opacity 0.2s ease, visibility 0s;
+}
+.custom-moisture-control {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(7, 16, 15, 0.7);
+}
+.custom-moisture-heading,
+.custom-moisture-endpoints {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.custom-moisture-heading label {
+  color: var(--muted);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+}
+.custom-moisture-heading output {
+  color: var(--green);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+.custom-moisture-control input[type="range"] {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+.custom-moisture-control input[type="range"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+.custom-moisture-endpoints {
+  color: var(--muted);
+  font-size: 0.56rem;
+}
 .notice {
   margin: 14px 0 0;
   color: var(--amber);

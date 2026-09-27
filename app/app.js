@@ -14,6 +14,9 @@ const BLYNK_REQUEST_TIMEOUT_MS = 8000;
 let refreshInProgress = false;
 let pumpCommandInFlight = false;
 let pumpCommandVersion = 0;
+let lastSyncedCropProfile = null;
+let customMoistureWriteInFlight = false;
+let customMoistureCommandVersion = 0;
 
 const translations = {
   en: {
@@ -129,6 +132,7 @@ const systemState = {
   irrigationRequirement: null,
   season: "SUMMER",
   cropProfile: "GENERAL CROPS",
+  customProfileSelected: false,
   customMoisture: null,
   statusState: "CHECKING",
   pumpCommand: "OFF",
@@ -508,11 +512,33 @@ function renderSystemState() {
     group.querySelectorAll("[data-choice]").forEach((button) => {
       const isSelected = targetKey === "season"
         ? button.dataset.choice === activeValue
-        : cropChoiceToPin(button.dataset.choice) === cropProfileToPin(activeValue);
+        : button.dataset.choice === "CUSTOM"
+          ? systemState.customProfileSelected
+          : !systemState.customProfileSelected && cropChoiceToPin(button.dataset.choice) === cropProfileToPin(activeValue);
       button.classList.toggle("is-selected", isSelected);
       button.disabled = !systemState.esp32Online || isChecking || isConnectionError;
+      if (targetKey === "crop" && button.dataset.choice === "CUSTOM") {
+        button.setAttribute("aria-expanded", String(systemState.customProfileSelected));
+      }
     });
   });
+
+  const customMoisturePanel = document.querySelector("[data-custom-moisture-panel]");
+  const customMoistureSlider = document.getElementById("customMoistureSlider");
+  const customMoistureValue = document.querySelector("[data-custom-moisture-value]");
+  if (customMoisturePanel) {
+    customMoisturePanel.classList.toggle("is-expanded", systemState.customProfileSelected);
+    customMoisturePanel.setAttribute("aria-hidden", String(!systemState.customProfileSelected));
+  }
+  if (customMoistureSlider) {
+    customMoistureSlider.disabled = !systemState.esp32Online || isChecking || isConnectionError;
+    if (systemState.customMoisture !== null && !customMoistureSlider.matches(":active")) {
+      customMoistureSlider.value = String(Math.min(100, Math.max(0, systemState.customMoisture)));
+    }
+  }
+  if (customMoistureValue && systemState.customMoisture !== null && !customMoistureSlider?.matches(":active")) {
+    customMoistureValue.textContent = `${Math.min(100, Math.max(0, systemState.customMoisture))}%`;
+  }
 
   const selectedComponent = document.querySelector(".component-item.is-selected")?.dataset.component || "esp32";
   updateComponentInfo(selectedComponent);
@@ -536,8 +562,6 @@ const CROP_PROFILE_VALUES = {
   "GENERAL CROPS": 0,
   "LEAFY PLANTS": 1,
   "VEGETABLES": 2,
-  CUSTOM: 3,
-  "VEGETABLE": 4,
 };
 
 function cropChoiceToPin(choice) {
@@ -549,7 +573,7 @@ function cropProfileToPin(profile) {
 }
 
 function pinToCropProfile(value) {
-  return value === 1 ? "LEAFY PLANTS" : value === 2 || value === 4 ? "VEGETABLES" : value === 3 ? "CUSTOM" : "GENERAL CROPS";
+  return value === 1 ? "LEAFY PLANTS" : value === 2 ? "VEGETABLES" : "GENERAL CROPS";
 }
 
 async function updateAllBlynkValues() {
@@ -592,6 +616,7 @@ async function refreshHardwareStatus() {
   if (refreshInProgress || pumpCommandInFlight) return;
   refreshInProgress = true;
   const refreshPumpVersion = pumpCommandVersion;
+  const refreshCustomMoistureVersion = customMoistureCommandVersion;
   systemState.statusState = "CHECKING";
   renderSystemState();
 
@@ -617,8 +642,14 @@ async function refreshHardwareStatus() {
       }
       systemState.irrigationMode = values.mode === 1 ? "AUTO" : "MANUAL";
       systemState.season = values.season === 1 ? "WINTER" : "SUMMER";
+      if (lastSyncedCropProfile !== null && values.cropProfile !== lastSyncedCropProfile) {
+        systemState.customProfileSelected = false;
+      }
+      lastSyncedCropProfile = values.cropProfile;
       systemState.cropProfile = pinToCropProfile(values.cropProfile);
-      systemState.customMoisture = values.customMoisture;
+      if (!customMoistureWriteInFlight && refreshCustomMoistureVersion === customMoistureCommandVersion) {
+        systemState.customMoisture = values.customMoisture;
+      }
       updateTrendHistory();
     }
 
@@ -710,11 +741,17 @@ function bindControls() {
       button.addEventListener("click", async () => {
         if (!systemState.esp32Online) return;
         const nextValue = button.dataset.choice;
+        if (group.dataset.setting === "crop" && nextValue === "CUSTOM") {
+          systemState.customProfileSelected = true;
+          renderSystemState();
+          return;
+        }
         const pin = group.dataset.setting === "season" ? BLYNK_VIRTUAL_PINS.season : BLYNK_VIRTUAL_PINS.cropProfile;
         const value = group.dataset.setting === "season"
           ? nextValue === "WINTER" ? 1 : 0
           : cropChoiceToPin(nextValue);
         try {
+          if (group.dataset.setting === "crop") systemState.customProfileSelected = false;
           await setBlynkValue(pin, value);
           await refreshHardwareStatus();
           if (elements.commandMessage) elements.commandMessage.textContent = "Setting synchronized with ESP32.";
@@ -726,6 +763,32 @@ function bindControls() {
       });
     });
   });
+
+  const customMoistureSlider = document.getElementById("customMoistureSlider");
+  const customMoistureValue = document.querySelector("[data-custom-moisture-value]");
+  if (customMoistureSlider) {
+    customMoistureSlider.addEventListener("input", () => {
+      const value = Number(customMoistureSlider.value);
+      systemState.customMoisture = value;
+      if (customMoistureValue) customMoistureValue.textContent = `${value}%`;
+    });
+    customMoistureSlider.addEventListener("change", async () => {
+      if (!systemState.esp32Online) return;
+      const value = Number(customMoistureSlider.value);
+      customMoistureCommandVersion += 1;
+      customMoistureWriteInFlight = true;
+      try {
+        await setBlynkValue(BLYNK_VIRTUAL_PINS.customMoisture, value);
+        if (elements.commandMessage) elements.commandMessage.textContent = `Custom moisture set to ${value}%.`;
+      } catch (error) {
+        console.error("[BLYNK] custom moisture update failed:", error);
+        systemState.statusState = "CONNECTION ERROR";
+        renderSystemState();
+      } finally {
+        customMoistureWriteInFlight = false;
+      }
+    });
+  }
 
   document.querySelectorAll("[data-component]").forEach((button) => {
     button.addEventListener("click", () => {

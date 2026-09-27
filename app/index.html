@@ -165,7 +165,17 @@
                   <button type="button" data-choice="GENERAL CROPS" class="is-selected">GENERAL</button>
                   <button type="button" data-choice="LEAFY PLANTS">LEAFY</button>
                   <button type="button" data-choice="VEGETABLES">VEGETABLES</button>
-                  <button type="button" data-choice="CUSTOM">CUSTOM</button>
+                  <button type="button" data-choice="CUSTOM" aria-expanded="false">CUSTOM</button>
+                </div>
+                <div class="custom-moisture-panel" data-custom-moisture-panel aria-hidden="true">
+                  <div class="custom-moisture-control">
+                    <div class="custom-moisture-heading">
+                      <label for="customMoistureSlider">CUSTOM MOISTURE</label>
+                      <output data-custom-moisture-value for="customMoistureSlider">55%</output>
+                    </div>
+                    <input id="customMoistureSlider" type="range" min="0" max="100" step="1" value="55" aria-label="Custom moisture threshold">
+                    <div class="custom-moisture-endpoints" aria-hidden="true"><span>0%</span><span>100%</span></div>
+                  </div>
                 </div>
               </div>
             </div>
