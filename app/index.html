@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Smart Farming IoT prototype dashboard." />
     <title>Prototype Smart Farm | Project App</title>
-    <link rel="stylesheet" href="style.css?v=20260925-2" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css?v=20261006-15" />
   </head>
   <body>
     <div class="app-shell">
@@ -47,24 +50,46 @@
           <div class="status-strip" data-status-strip></div>
         </section>
 
+        <section class="panel local-weather-card" aria-labelledby="local-weather-title">
+          <div class="local-weather-header">
+            <div>
+              <span class="card-label" id="local-weather-title">LOCAL WEATHER</span>
+              <p class="local-weather-location" data-weather-location>Weather for your area</p>
+            </div>
+            <span class="local-weather-icon" data-weather-icon aria-hidden="true">☁</span>
+          </div>
+          <div class="local-weather-content" data-weather-content hidden>
+            <div class="local-weather-current">
+              <strong data-weather-temperature>--°</strong>
+              <span data-weather-condition>--</span>
+              <span class="local-weather-feels" data-weather-feels></span>
+            </div>
+            <div class="local-weather-details">
+              <span>Humidity <strong data-weather-humidity>--</strong></span>
+              <span>Rain <strong data-weather-rain>--</strong></span>
+              <span>Wind <strong data-weather-wind>--</strong></span>
+            </div>
+            <div class="local-weather-meta">
+              <span>Updated <time data-weather-updated>--:--</time></span>
+              <span>Weather: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · Place: <a href="https://www.bigdatacloud.com/" target="_blank" rel="noopener noreferrer">BigDataCloud</a></span>
+            </div>
+          </div>
+          <p class="local-weather-message" data-weather-message aria-live="polite">
+            Choose to share your location to see current local conditions.
+          </p>
+          <button class="local-weather-button" type="button" data-weather-location-button>Use my location</button>
+          <p class="local-weather-privacy">Coordinates are sent to Open-Meteo and BigDataCloud for these lookups and are not saved by this dashboard.</p>
+        </section>
+
         <section class="gauge-grid" aria-label="Primary sensor metrics">
           <article class="gauge-card primary-card">
             <div class="gauge-header">
               <span class="card-label" data-i18n="temperature">TEMPERATURE</span>
               <span class="meter-pulse"></span>
             </div>
-            <div class="gauge dial-temperature">
-              <svg class="gauge-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                <path class="gauge-track" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
-                <path class="gauge-progress" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
-                <g class="gauge-ticks"></g>
-                <line class="gauge-needle" x1="120" y1="142" x2="32" y2="142"></line>
-                <circle class="gauge-pivot" cx="120" cy="142" r="6"></circle>
-              </svg>
-              <div class="gauge-inner">
-                <strong data-value="temperature">--</strong>
-                <small>°C</small>
-              </div>
+            <div class="metric-value">
+              <strong data-value="temperature">--</strong>
+              <small>°C</small>
             </div>
             <div class="gauge-status" data-status="temperature">NO SENSOR DATA</div>
           </article>
@@ -74,18 +99,9 @@
               <span class="card-label" data-i18n="humidity">HUMIDITY</span>
               <span class="meter-pulse"></span>
             </div>
-            <div class="gauge dial-humidity">
-              <svg class="gauge-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                <path class="gauge-track" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
-                <path class="gauge-progress" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
-                <g class="gauge-ticks"></g>
-                <line class="gauge-needle" x1="120" y1="142" x2="32" y2="142"></line>
-                <circle class="gauge-pivot" cx="120" cy="142" r="6"></circle>
-              </svg>
-              <div class="gauge-inner">
-                <strong data-value="humidity">--</strong>
-                <small>%</small>
-              </div>
+            <div class="metric-value">
+              <strong data-value="humidity">--</strong>
+              <small>%</small>
             </div>
             <div class="gauge-status" data-status="humidity">NO SENSOR DATA</div>
           </article>
@@ -95,18 +111,9 @@
               <span class="card-label" data-i18n="soilMoisture">SOIL MOISTURE</span>
               <span class="meter-pulse"></span>
             </div>
-            <div class="gauge dial-soil">
-              <svg class="gauge-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                <path class="gauge-track" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
-                <path class="gauge-progress" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
-                <g class="gauge-ticks"></g>
-                <line class="gauge-needle" x1="120" y1="142" x2="32" y2="142"></line>
-                <circle class="gauge-pivot" cx="120" cy="142" r="6"></circle>
-              </svg>
-              <div class="gauge-inner">
-                <strong data-value="soilMoisture">--</strong>
-                <small>%</small>
-              </div>
+            <div class="metric-value">
+              <strong data-value="soilMoisture">--</strong>
+              <small>%</small>
             </div>
             <div class="gauge-status" data-status="soilMoisture">NO SENSOR DATA</div>
           </article>
@@ -116,19 +123,10 @@
               <span class="card-label" data-i18n="pumpStatus">PUMP STATUS</span>
               <span class="meter-pulse"></span>
             </div>
-            <div class="gauge dial-pump">
-              <svg class="gauge-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                <path class="gauge-track" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
-                <path class="gauge-progress" d="M 32 142 A 88 88 0 0 1 208 142" pathLength="100"></path>
-                <g class="gauge-ticks"></g>
-                <line class="gauge-needle" x1="120" y1="142" x2="32" y2="142"></line>
-                <circle class="gauge-pivot" cx="120" cy="142" r="6"></circle>
-              </svg>
-              <div class="gauge-inner tank-status">
-                <strong data-pump-state>NOT CONNECTED</strong>
-              </div>
+            <div class="metric-value pump-value">
+              <strong data-pump-state>OFF</strong>
             </div>
-            <div class="gauge-status" data-pump-readout>OFFLINE</div>
+            <div class="gauge-status" data-pump-readout>AUTOMATIC</div>
           </article>
         </section>
 
@@ -183,9 +181,23 @@
 
             <p class="notice" data-command-message>ESP32 is offline. Pump controls are disabled.</p>
           </article>
+
+          <article class="panel decision-panel" aria-label="Automatic irrigation decision">
+            <div class="panel-header">
+              <span class="card-label" data-i18n="automaticDecision">AUTOMATIC DECISION</span>
+            </div>
+            <div class="decision-summary" aria-live="polite">
+              <span><span data-i18n="soilLabel">Soil</span><strong data-decision-soil>--</strong></span>
+              <span><span data-i18n="targetLabel">Target</span><strong data-decision-target>55%</strong></span>
+              <strong class="decision-result" data-decision-result data-i18n="decisionWaiting">WAITING FOR SENSOR DATA</strong>
+            </div>
+          </article>
         </section>
 
         <section class="bottom-grid">
+          <div class="trends-heading">
+            <span class="card-label" data-i18n="sensorTrends">SENSOR TRENDS</span>
+          </div>
           <article class="panel chart-panel telemetry-chart">
             <div class="panel-header">
               <span class="card-label">TEMPERATURE TREND</span>
@@ -273,6 +285,7 @@
       </footer>
     </div>
 
-    <script src="app.js?v=20260927-3" defer></script>
+    <script src="app.js?v=20261006-1" defer></script>
+    <script src="weather.js?v=20261006-4" defer></script>
   </body>
 </html>
