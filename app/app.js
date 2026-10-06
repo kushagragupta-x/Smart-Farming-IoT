@@ -11,6 +11,7 @@ const BLYNK_VIRTUAL_PINS = {
   soilMoisture: "V4",
 };
 const BLYNK_REQUEST_TIMEOUT_MS = 8000;
+const DEFAULT_MOISTURE_TARGET = 55;
 let refreshInProgress = false;
 let pumpCommandInFlight = false;
 let pumpCommandVersion = 0;
@@ -38,9 +39,19 @@ const translations = {
     soilMoistureTrend: "SOIL MOISTURE TREND",
     adaptiveIrrigation: "ADAPTIVE IRRIGATION",
     adaptiveDecision: "ADAPTIVE DECISION",
+    automaticDecision: "AUTOMATIC DECISION",
     irrigationRequired: "IRRIGATION REQUIRED?",
     moistureTrend: "MOISTURE TREND",
     requirement: "REQUIREMENT",
+    soilLabel: "Soil",
+    targetLabel: "Target",
+    waterRequired: "WATER REQUIRED",
+    targetMet: "TARGET MET",
+    decisionWaiting: "WAITING FOR SENSOR DATA",
+    decisionUnavailable: "DECISION UNAVAILABLE",
+    normal: "NORMAL",
+    optimal: "OPTIMAL",
+    checkConditions: "CHECK CONDITIONS",
     componentStatus: "COMPONENT STATUS",
     soilSensor: "SOIL SENSOR",
     relay: "RELAY",
@@ -75,9 +86,19 @@ const translations = {
     soilMoistureTrend: "मिट्टी की नमी ट्रेंड",
     adaptiveIrrigation: "अनुकूली सिंचाई",
     adaptiveDecision: "अनुकूली निर्णय",
+    automaticDecision: "स्वचालित निर्णय",
     irrigationRequired: "सिंचाई आवश्यक?",
     moistureTrend: "नमी ट्रेंड",
     requirement: "आवश्यकता",
+    soilLabel: "मिट्टी",
+    targetLabel: "लक्ष्य",
+    waterRequired: "पानी आवश्यक",
+    targetMet: "लक्ष्य पूरा",
+    decisionWaiting: "सेंसर डेटा की प्रतीक्षा",
+    decisionUnavailable: "निर्णय उपलब्ध नहीं",
+    normal: "सामान्य",
+    optimal: "अनुकूल",
+    checkConditions: "स्थिति जाँचें",
     componentStatus: "घटक स्थिति",
     soilSensor: "मिट्टी सेंसर",
     relay: "रिले",
@@ -158,6 +179,9 @@ const elements = {
   pumpButton: document.querySelector("[data-pump-command]"),
   pumpState: document.querySelector("[data-pump-state]"),
   pumpReadout: document.querySelector("[data-pump-readout]"),
+  decisionSoil: document.querySelector("[data-decision-soil]"),
+  decisionTarget: document.querySelector("[data-decision-target]"),
+  decisionResult: document.querySelector("[data-decision-result]"),
   requirement: document.querySelector("[data-requirement]"),
   requirementCopy: document.querySelector("[data-requirement-copy]"),
   trend: document.querySelector("[data-trend]"),
@@ -240,69 +264,6 @@ async function setBlynkValue(pin, value) {
     throw new Error(`Blynk rejected the update for ${pin}.`);
   }
   return value;
-}
-
-const GAUGE_GEOMETRY = {
-  centerX: 120,
-  centerY: 142,
-  tickRadius: 88,
-  tickCount: 11,
-};
-
-function initializeGaugeGeometry() {
-  document.querySelectorAll(".gauge").forEach((gauge) => {
-    const tickGroup = gauge.querySelector(".gauge-ticks");
-    if (!tickGroup || tickGroup.childElementCount) return;
-
-    for (let index = 0; index < GAUGE_GEOMETRY.tickCount; index += 1) {
-      const ratio = index / (GAUGE_GEOMETRY.tickCount - 1);
-      const angle = Math.PI + (ratio * Math.PI);
-      const outerRadius = GAUGE_GEOMETRY.tickRadius + 7;
-      const innerRadius = GAUGE_GEOMETRY.tickRadius - (index % 5 === 0 ? 7 : 4);
-      const x1 = GAUGE_GEOMETRY.centerX + (Math.cos(angle) * innerRadius);
-      const y1 = GAUGE_GEOMETRY.centerY + (Math.sin(angle) * innerRadius);
-      const x2 = GAUGE_GEOMETRY.centerX + (Math.cos(angle) * outerRadius);
-      const y2 = GAUGE_GEOMETRY.centerY + (Math.sin(angle) * outerRadius);
-      const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      tick.setAttribute("x1", x1.toFixed(2));
-      tick.setAttribute("y1", y1.toFixed(2));
-      tick.setAttribute("x2", x2.toFixed(2));
-      tick.setAttribute("y2", y2.toFixed(2));
-      if (index % 5 === 0) tick.classList.add("major");
-      tickGroup.appendChild(tick);
-    }
-  });
-}
-
-function renderGauge(selector, value, min, max, hasValue = true) {
-  const meter = document.querySelector(selector);
-  if (!meter) return;
-
-  const progressArc = meter.querySelector(".gauge-progress");
-  const needle = meter.querySelector(".gauge-needle");
-  const numericValue = typeof value === "number" && Number.isFinite(value) ? value : null;
-  const visible = hasValue && numericValue !== null;
-  const safeValue = visible ? Math.min(Math.max(numericValue, min), max) : min;
-  const ratio = visible ? (safeValue - min) / (max - min) : 0;
-  const percentage = ratio * 100;
-
-  meter.style.setProperty("--progress", percentage);
-  if (progressArc) progressArc.style.strokeDashoffset = `${100 - percentage}`;
-  if (needle) {
-    needle.style.opacity = visible ? "1" : "0";
-    needle.style.transform = `rotate(${ratio * 180}deg)`;
-  }
-}
-
-function updateMeterProgress() {
-  const soilValue = typeof systemState.soilMoisture === "number" ? systemState.soilMoisture : null;
-  const humidityValue = typeof systemState.humidity === "number" ? systemState.humidity : null;
-  const temperatureValue = typeof systemState.temperature === "number" ? systemState.temperature : null;
-
-  renderGauge(".dial-soil", soilValue, 0, 100, soilValue !== null);
-  renderGauge(".dial-humidity", humidityValue, 0, 100, humidityValue !== null);
-  renderGauge(".dial-temperature", temperatureValue, 0, 60, temperatureValue !== null);
-  renderGauge(".dial-pump", systemState.pumpCommand === "ON" ? 100 : 0, 0, 100, systemState.esp32Online);
 }
 
 function updateTrendHistory() {
@@ -404,19 +365,30 @@ function renderSystemState() {
   const wifiLabel = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.wifiConnected ? t("online", "ONLINE") : t("offline", "OFFLINE");
   const cloudLabel = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.cloudConnected ? t("online", "ONLINE") : t("offline", "OFFLINE");
 
-  const soilStatus = systemState.soilMoisture === null ? t("noSensorData", "NO SENSOR DATA") : `${systemState.soilMoisture}%`;
-  const humidityStatus = systemState.humidity === null ? t("noSensorData", "NO SENSOR DATA") : systemState.esp32Online ? "LIVE DATA" : "ESP32 OFFLINE";
-  const temperatureStatus = systemState.temperature === null ? t("noSensorData", "NO SENSOR DATA") : systemState.esp32Online ? "LIVE DATA" : "ESP32 OFFLINE";
-  const soilStatusText = systemState.soilMoisture === null ? t("noSensorData", "NO SENSOR DATA") : systemState.esp32Online ? "SENSOR OK" : "ESP32 OFFLINE";
+  const moistureTarget = systemState.customProfileSelected && systemState.customMoisture !== null
+    ? systemState.customMoisture
+    : DEFAULT_MOISTURE_TARGET;
+  const soilStatusText = systemState.soilMoisture === null
+    ? t("noSensorData", "NO SENSOR DATA")
+    : systemState.soilMoisture < moistureTarget
+      ? t("waterRequired", "WATER REQUIRED")
+      : t("optimal", "OPTIMAL");
+  const temperatureStatus = systemState.temperature === null
+    ? t("noSensorData", "NO SENSOR DATA")
+    : systemState.temperature >= 15 && systemState.temperature <= 35
+      ? t("normal", "NORMAL")
+      : t("checkConditions", "CHECK CONDITIONS");
+  const humidityStatus = systemState.humidity === null
+    ? t("noSensorData", "NO SENSOR DATA")
+    : systemState.humidity >= 40 && systemState.humidity <= 70
+      ? t("optimal", "OPTIMAL")
+      : t("checkConditions", "CHECK CONDITIONS");
 
   const valueLabels = {
     soilMoisture: systemState.soilMoisture === null ? "--" : `${systemState.soilMoisture}`,
     humidity: systemState.humidity === null ? "--" : `${systemState.humidity}`,
     temperature: systemState.temperature === null ? "--" : `${systemState.temperature}`,
   };
-
-  console.log("[GAUGE] updating temperature:", valueLabels.temperature, "status:", temperatureStatus);
-  console.log("[GAUGE] updating humidity:", valueLabels.humidity, "status:", humidityStatus);
 
   Object.entries(valueLabels).forEach(([key, value]) => setText(`[data-value="${key}"]`, value));
 
@@ -482,7 +454,11 @@ function renderSystemState() {
     elements.pumpState.classList.remove("state-off", "state-on", "state-neutral");
     elements.pumpState.classList.add(systemState.esp32Online && systemState.pumpCommand === "ON" ? "state-on" : "state-off");
   }
-  if (elements.pumpReadout) elements.pumpReadout.textContent = systemState.esp32Online ? (systemState.pumpCommand === "ON" ? "PUMP ACTIVE" : "PUMP READY") : "SYSTEM OFFLINE";
+  if (elements.pumpReadout) {
+    elements.pumpReadout.textContent = systemState.esp32Online
+      ? systemState.irrigationMode === "AUTO" ? t("automatic", "AUTOMATIC") : t("manual", "MANUAL")
+      : t("offline", "OFFLINE");
+  }
 
   const pumpDisabled = !systemState.esp32Online || isChecking || isConnectionError || pumpCommandInFlight || systemState.irrigationMode !== "MANUAL";
   if (elements.pumpButton) {
@@ -517,6 +493,19 @@ function renderSystemState() {
 
   if (elements.requirementCopy) elements.requirementCopy.textContent = systemState.irrigationRequirement || t("noSensorData", "NO SENSOR DATA");
   if (elements.trend) elements.trend.textContent = systemState.moistureTrend || t("noSensorData", "NO SENSOR DATA");
+  if (elements.decisionSoil) {
+    elements.decisionSoil.textContent = systemState.soilMoisture === null ? "--" : `${systemState.soilMoisture}%`;
+  }
+  if (elements.decisionTarget) elements.decisionTarget.textContent = `${moistureTarget}%`;
+  if (elements.decisionResult) {
+    const decision = systemState.soilMoisture === null
+      ? isChecking ? t("decisionWaiting", "WAITING FOR SENSOR DATA") : t("decisionUnavailable", "DECISION UNAVAILABLE")
+      : systemState.soilMoisture < moistureTarget
+        ? t("waterRequired", "WATER REQUIRED")
+        : t("targetMet", "TARGET MET");
+    elements.decisionResult.textContent = decision;
+    elements.decisionResult.classList.toggle("is-required", systemState.soilMoisture !== null && systemState.soilMoisture < moistureTarget);
+  }
 
   document.querySelectorAll("[data-mode]").forEach((button) => {
     button.classList.toggle("is-selected", button.dataset.mode === systemState.irrigationMode);
@@ -559,7 +548,6 @@ function renderSystemState() {
 
   const selectedComponent = document.querySelector(".component-item.is-selected")?.dataset.component || "esp32";
   updateComponentInfo(selectedComponent);
-  updateMeterProgress();
   renderTrendCharts();
 }
 
@@ -856,7 +844,6 @@ function initializeUi() {
     button.classList.toggle("is-active", button.dataset.lang === systemState.language);
   });
 
-  initializeGaugeGeometry();
   renderSystemState();
   updateComponentInfo("esp32");
   bindControls();
