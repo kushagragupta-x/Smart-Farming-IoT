@@ -18,6 +18,7 @@
     windDirection: document.querySelector("[data-weather-wind-direction]"),
     alerts: document.querySelector("[data-weather-alerts]"),
     updated: document.querySelector("[data-weather-updated]"),
+    metricCards: document.querySelectorAll("[data-weather-metric-card]"),
   };
 
   if (Object.values(elements).some((element) => !element)) {
@@ -245,6 +246,9 @@
     const saved = save ? saveLocation(location) : true;
     elements.location.textContent = location.name;
     elements.content.hidden = true;
+    elements.metricCards.forEach((card) => {
+      card.hidden = true;
+    });
     elements.resultsWrap.hidden = true;
     setMessage("Loading the regional outdoor forecast…");
     setControlsDisabled(true);
@@ -306,6 +310,9 @@
       }).format(updatedAt);
       elements.updated.dateTime = updatedAt.toISOString();
       elements.content.hidden = false;
+      elements.metricCards.forEach((card) => {
+        card.hidden = false;
+      });
       setMessage(saved
         ? "Regional outdoor forecast from Open-Meteo. Not measured by the ESP32."
         : "Forecast loaded, but this location could not be saved for the current session.");

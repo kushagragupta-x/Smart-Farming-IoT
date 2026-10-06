@@ -320,7 +320,10 @@ a { color: inherit; text-decoration: none; }
   align-self: stretch;
   position: relative;
   display: grid;
-  gap: 9px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  gap: 10px 12px;
+  padding: 16px 18px;
   overflow: hidden;
   border-color: rgba(143, 228, 255, 0.24);
   background:
@@ -329,6 +332,40 @@ a { color: inherit; text-decoration: none; }
     linear-gradient(135deg, rgba(17, 33, 38, 0.9), rgba(7, 18, 20, 0.96));
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+}
+.local-weather-card > .local-weather-header,
+.local-weather-card > .local-weather-content,
+.local-weather-card > .local-weather-message,
+.local-weather-card > .weather-location-results,
+.local-weather-card > .local-weather-privacy {
+  grid-column: 1 / -1;
+}
+.local-weather-card > .weather-location-search {
+  grid-column: 1;
+}
+.local-weather-card > .weather-geolocation-button {
+  grid-column: 2;
+  align-self: center;
+}
+.local-weather-card > .local-weather-privacy {
+  font-size: 0.58rem;
+  line-height: 1.35;
+  padding: 0 2px;
+}
+.local-weather-card:has([data-weather-content]:not([hidden])) {
+  align-content: stretch;
+  gap: 4px 12px;
+  padding-block: 10px;
+}
+.local-weather-card:has([data-weather-content]:not([hidden])) > .local-weather-message {
+  display: none;
+}
+.local-weather-card:has([data-weather-content]:not([hidden])) > .weather-location-search {
+  grid-column: 1;
+}
+.local-weather-card:has([data-weather-content]:not([hidden])) > .local-weather-privacy {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .local-weather-header {
   display: flex;
@@ -356,7 +393,7 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   grid-template-columns: minmax(150px, 0.8fr) minmax(200px, 1.2fr);
   align-items: center;
-  gap: 12px;
+  gap: 8px 12px;
 }
 .local-weather-content[hidden] { display: none; }
 .local-weather-current {
@@ -383,30 +420,31 @@ a { color: inherit; text-decoration: none; }
 }
 .local-weather-details {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 7px;
 }
 .local-weather-details > span {
   display: grid;
   gap: 3px;
-  padding: 8px 9px;
+  padding: 7px 10px;
   border: 1px solid rgba(143, 228, 255, 0.12);
   border-radius: 10px;
   background: rgba(4, 14, 15, 0.42);
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .local-weather-details strong {
   color: var(--text);
-  font-size: 0.82rem;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 0;
   text-transform: none;
 }
 .weather-alerts {
   grid-column: 1 / -1;
-  padding: 10px 12px;
+  padding: 6px 12px;
   border: 1px solid rgba(143, 228, 255, 0.12);
   border-radius: 11px;
   background: rgba(4, 14, 15, 0.36);
@@ -431,7 +469,7 @@ a { color: inherit; text-decoration: none; }
 .weather-alerts ul {
   display: grid;
   gap: 5px;
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -504,7 +542,7 @@ a { color: inherit; text-decoration: none; }
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px 16px;
-  padding-top: 10px;
+  padding-top: 4px;
   border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: 0.62rem;
@@ -569,6 +607,7 @@ a { color: inherit; text-decoration: none; }
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.14), 0 12px 26px rgba(0, 0, 0, 0.12);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
+.weather-metric-card[hidden] { display: none; }
 .gauge-card:hover {
   transform: translateY(-2px);
   border-color: rgba(143, 228, 255, 0.2);
@@ -1246,7 +1285,13 @@ a { color: inherit; text-decoration: none; }
   .brand-name { letter-spacing: 0.08em; }
   .project-info-link { display: none; }
   .local-weather-content { grid-template-columns: 1fr; }
-  .local-weather-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .local-weather-details { grid-template-columns: minmax(0, 1fr); }
+  .local-weather-card { grid-template-columns: minmax(0, 1fr); }
+  .local-weather-card > .weather-location-search,
+  .local-weather-card > .weather-geolocation-button { grid-column: 1; }
+  .local-weather-card:has([data-weather-content]:not([hidden])) > .local-weather-privacy {
+    white-space: normal;
+  }
   .status-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .system-flow {
     grid-template-columns: repeat(3, minmax(0, 1fr));

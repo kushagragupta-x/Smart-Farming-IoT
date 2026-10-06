@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css?v=20261007-16" />
+    <link rel="stylesheet" href="style.css?v=20261007-17" />
   </head>
   <body>
     <div class="app-shell">
@@ -61,13 +61,11 @@
           <div class="local-weather-content" data-weather-content hidden>
             <div class="local-weather-current">
               <strong data-weather-condition>--</strong>
-              <span class="local-weather-feels">Regional outdoor forecast · not an on-site sensor reading</span>
+              <span class="local-weather-feels">Regional forecast · not an ESP32 reading</span>
             </div>
             <div class="local-weather-details">
               <span>Rain next 24 h<strong data-weather-rain-total>--</strong></span>
               <span>Peak rain chance<strong data-weather-rain-chance>--</strong></span>
-              <span>Wind<strong data-weather-wind>--</strong></span>
-              <span>Direction<strong data-weather-wind-direction>--</strong></span>
             </div>
             <div class="weather-alerts">
               <div class="weather-alerts-heading">
@@ -97,7 +95,7 @@
             <button class="local-weather-button" type="button" data-weather-select-button>Use selected location</button>
           </div>
           <button class="local-weather-button weather-geolocation-button" type="button" data-weather-location-button>Use my location</button>
-          <p class="local-weather-privacy">Weather uses your selected location, not the ESP32. For farm conditions, set your farm or allow location access while there.</p>
+          <p class="local-weather-privacy">Forecast uses your selected location, not the ESP32. Set your farm location or allow access while on-site.</p>
         </section>
 
         <section class="gauge-grid" aria-label="Primary sensor metrics">
@@ -146,6 +144,28 @@
               <strong data-pump-state>OFF</strong>
             </div>
             <div class="gauge-status" data-pump-readout>AUTOMATIC</div>
+          </article>
+
+          <article class="gauge-card weather-metric-card" data-weather-metric-card hidden>
+            <div class="gauge-header">
+              <span class="card-label">WIND SPEED</span>
+              <span class="meter-pulse"></span>
+            </div>
+            <div class="metric-value">
+              <strong data-weather-wind>--</strong>
+            </div>
+            <div class="gauge-status">REGIONAL FORECAST</div>
+          </article>
+
+          <article class="gauge-card weather-metric-card" data-weather-metric-card hidden>
+            <div class="gauge-header">
+              <span class="card-label">WIND DIRECTION</span>
+              <span class="meter-pulse"></span>
+            </div>
+            <div class="metric-value">
+              <strong data-weather-wind-direction>--</strong>
+            </div>
+            <div class="gauge-status">REGIONAL FORECAST</div>
           </article>
         </section>
 
@@ -305,6 +325,6 @@
     </div>
 
     <script src="app.js?v=20261006-1" defer></script>
-    <script src="weather.js?v=20261007-5" defer></script>
+    <script src="weather.js?v=20261007-6" defer></script>
   </body>
 </html>
