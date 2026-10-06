@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css?v=20261006-15" />
+    <link rel="stylesheet" href="style.css?v=20261007-16" />
   </head>
   <body>
     <div class="app-shell">
@@ -53,32 +53,51 @@
         <section class="panel local-weather-card" aria-labelledby="local-weather-title">
           <div class="local-weather-header">
             <div>
-              <span class="card-label" id="local-weather-title">LOCAL WEATHER</span>
-              <p class="local-weather-location" data-weather-location>Weather for your area</p>
+              <span class="card-label" id="local-weather-title">FARM-AREA OUTLOOK</span>
+              <p class="local-weather-location" data-weather-location>No farm location selected</p>
             </div>
             <span class="local-weather-icon" data-weather-icon aria-hidden="true">☁</span>
           </div>
           <div class="local-weather-content" data-weather-content hidden>
             <div class="local-weather-current">
-              <strong data-weather-temperature>--°</strong>
-              <span data-weather-condition>--</span>
-              <span class="local-weather-feels" data-weather-feels></span>
+              <strong data-weather-condition>--</strong>
+              <span class="local-weather-feels">Regional outdoor forecast · not an on-site sensor reading</span>
             </div>
             <div class="local-weather-details">
-              <span>Humidity <strong data-weather-humidity>--</strong></span>
-              <span>Rain <strong data-weather-rain>--</strong></span>
-              <span>Wind <strong data-weather-wind>--</strong></span>
+              <span>Rain next 24 h<strong data-weather-rain-total>--</strong></span>
+              <span>Peak rain chance<strong data-weather-rain-chance>--</strong></span>
+              <span>Wind<strong data-weather-wind>--</strong></span>
+              <span>Direction<strong data-weather-wind-direction>--</strong></span>
+            </div>
+            <div class="weather-alerts">
+              <div class="weather-alerts-heading">
+                <strong>UPCOMING WEATHER · 24 H</strong>
+                <span>Forecast-based information, not official weather alerts</span>
+              </div>
+              <ul data-weather-alerts aria-live="polite">
+                <li>No forecast loaded.</li>
+              </ul>
             </div>
             <div class="local-weather-meta">
               <span>Updated <time data-weather-updated>--:--</time></span>
-              <span>Weather: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · Place: <a href="https://www.bigdatacloud.com/" target="_blank" rel="noopener noreferrer">BigDataCloud</a></span>
+              <span>Forecast: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a></span>
             </div>
           </div>
           <p class="local-weather-message" data-weather-message aria-live="polite">
-            Choose to share your location to see current local conditions.
+            Search for your farm or use your current location to load the regional forecast.
           </p>
-          <button class="local-weather-button" type="button" data-weather-location-button>Use my location</button>
-          <p class="local-weather-privacy">Coordinates are sent to Open-Meteo and BigDataCloud for these lookups and are not saved by this dashboard.</p>
+          <form class="weather-location-search" data-weather-search-form>
+            <label class="visually-hidden" for="weatherLocationSearch">Search for a farm location</label>
+            <input id="weatherLocationSearch" type="search" data-weather-search-input placeholder="Search town, region or farm area" autocomplete="off" />
+            <button class="local-weather-button" type="submit" data-weather-search-button>Search</button>
+          </form>
+          <div class="weather-location-results" data-weather-results-wrap hidden>
+            <label class="visually-hidden" for="weatherLocationResults">Select a matching location</label>
+            <select id="weatherLocationResults" data-weather-results></select>
+            <button class="local-weather-button" type="button" data-weather-select-button>Use selected location</button>
+          </div>
+          <button class="local-weather-button weather-geolocation-button" type="button" data-weather-location-button>Use my location</button>
+          <p class="local-weather-privacy">Weather uses your selected location, not the ESP32. For farm conditions, set your farm or allow location access while there.</p>
         </section>
 
         <section class="gauge-grid" aria-label="Primary sensor metrics">
@@ -280,12 +299,12 @@
       </main>
 
       <footer class="site-footer">
-        <span>PROJECT APP / LOCAL UI BUILD</span>
-        <span>SECURE API CONNECTION PENDING</span>
+        <span>Made by Team Prototype • IX-F</span>
+        <span>Smart Irrigation & Multi-Layer Farming System</span>
       </footer>
     </div>
 
     <script src="app.js?v=20261006-1" defer></script>
-    <script src="weather.js?v=20261006-4" defer></script>
+    <script src="weather.js?v=20261007-5" defer></script>
   </body>
 </html>
