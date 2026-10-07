@@ -41,6 +41,7 @@
         color: var(--text);
         line-height: 1.5;
         overflow-x: hidden;
+        isolation: isolate;
       }
 
       body::before {
@@ -53,6 +54,26 @@
         background-size: 34px 34px;
         pointer-events: none;
         opacity: 0.9;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: -24%;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse at 18% 34%, rgba(62, 139, 255, 0.2), transparent 34%),
+          radial-gradient(ellipse at 78% 28%, rgba(73, 255, 190, 0.16), transparent 36%),
+          radial-gradient(ellipse at 55% 78%, rgba(48, 174, 205, 0.12), transparent 38%);
+        filter: blur(42px);
+        transform: translate3d(-2%, 1%, 0) scale(1);
+        animation: ambientDrift 28s ease-in-out infinite alternate;
+      }
+
+      @keyframes ambientDrift {
+        from { transform: translate3d(-2%, 1%, 0) scale(1); }
+        to { transform: translate3d(2%, -1%, 0) scale(1.08); }
       }
 
       .page-shell {
