@@ -11,7 +11,18 @@ const BLYNK_VIRTUAL_PINS = {
   soilMoisture: "V4",
 };
 const BLYNK_REQUEST_TIMEOUT_MS = 8000;
-const DEFAULT_MOISTURE_TARGET = 55;
+const MOISTURE_TARGETS = {
+  SUMMER: {
+    "GENERAL CROPS": 55,
+    "LEAFY PLANTS": 65,
+    VEGETABLES: 60,
+  },
+  WINTER: {
+    "GENERAL CROPS": 45,
+    "LEAFY PLANTS": 55,
+    VEGETABLES: 50,
+  },
+};
 let refreshInProgress = false;
 let pumpCommandInFlight = false;
 let pumpCommandVersion = 0;
@@ -35,7 +46,7 @@ const translations = {
     manual: "MANUAL",
     season: "SEASON",
     cropProfile: "CROP PROFILE",
-    customMoistureHelp: "Set the minimum soil moisture level. In Automatic Mode, the pump turns ON when soil moisture falls below this percentage.",
+    customMoistureHelp: "Set the minimum soil moisture level. In Automatic Mode, the pump turns ON when soil moisture is at or below this percentage.",
     soilMoistureTrend: "SOIL MOISTURE TREND",
     adaptiveIrrigation: "ADAPTIVE IRRIGATION",
     adaptiveDecision: "ADAPTIVE DECISION",
@@ -82,7 +93,7 @@ const translations = {
     manual: "मैनुअल",
     season: "मौसम",
     cropProfile: "फसल प्रोफ़ाइल",
-    customMoistureHelp: "मिट्टी की नमी का न्यूनतम स्तर सेट करें। स्वचालित मोड में, नमी इस प्रतिशत से नीचे जाने पर पंप चालू हो जाता है।",
+    customMoistureHelp: "मिट्टी की नमी का न्यूनतम स्तर सेट करें। स्वचालित मोड में, नमी इस प्रतिशत या उससे कम होने पर पंप चालू हो जाता है।",
     soilMoistureTrend: "मिट्टी की नमी ट्रेंड",
     adaptiveIrrigation: "अनुकूली सिंचाई",
     adaptiveDecision: "अनुकूली निर्णय",
@@ -213,6 +224,13 @@ function applyCustomMoistureValue(value) {
   if (slider) slider.value = String(normalizedValue);
   if (display) display.textContent = `${normalizedValue}%`;
   console.log("CUSTOM MOISTURE UI UPDATED:", normalizedValue);
+}
+
+function getMoistureTarget() {
+  if (systemState.customProfileSelected || systemState.cropProfile === "CUSTOM") {
+    return systemState.customMoisture;
+  }
+  return MOISTURE_TARGETS[systemState.season]?.[systemState.cropProfile] ?? null;
 }
 
 function assertBlynkToken() {
@@ -365,12 +383,12 @@ function renderSystemState() {
   const wifiLabel = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.wifiConnected ? t("online", "ONLINE") : t("offline", "OFFLINE");
   const cloudLabel = isChecking ? "CHECKING" : isConnectionError ? "ERROR" : systemState.cloudConnected ? t("online", "ONLINE") : t("offline", "OFFLINE");
 
-  const moistureTarget = systemState.customProfileSelected && systemState.customMoisture !== null
-    ? systemState.customMoisture
-    : DEFAULT_MOISTURE_TARGET;
+  const moistureTarget = getMoistureTarget();
   const soilStatusText = systemState.soilMoisture === null
     ? t("noSensorData", "NO SENSOR DATA")
-    : systemState.soilMoisture < moistureTarget
+    : moistureTarget === null
+      ? t("decisionUnavailable", "DECISION UNAVAILABLE")
+      : systemState.soilMoisture < moistureTarget
       ? t("waterRequired", "WATER REQUIRED")
       : t("optimal", "OPTIMAL");
   const temperatureStatus = systemState.temperature === null
@@ -496,15 +514,17 @@ function renderSystemState() {
   if (elements.decisionSoil) {
     elements.decisionSoil.textContent = systemState.soilMoisture === null ? "--" : `${systemState.soilMoisture}%`;
   }
-  if (elements.decisionTarget) elements.decisionTarget.textContent = `${moistureTarget}%`;
+  if (elements.decisionTarget) {
+    elements.decisionTarget.textContent = moistureTarget === null ? "--" : `${moistureTarget}%`;
+  }
   if (elements.decisionResult) {
-    const decision = systemState.soilMoisture === null
+    const decision = systemState.soilMoisture === null || moistureTarget === null
       ? isChecking ? t("decisionWaiting", "WAITING FOR SENSOR DATA") : t("decisionUnavailable", "DECISION UNAVAILABLE")
       : systemState.soilMoisture < moistureTarget
         ? t("waterRequired", "WATER REQUIRED")
         : t("targetMet", "TARGET MET");
     elements.decisionResult.textContent = decision;
-    elements.decisionResult.classList.toggle("is-required", systemState.soilMoisture !== null && systemState.soilMoisture < moistureTarget);
+    elements.decisionResult.classList.toggle("is-required", systemState.soilMoisture !== null && moistureTarget !== null && systemState.soilMoisture < moistureTarget);
   }
 
   document.querySelectorAll("[data-mode]").forEach((button) => {
@@ -759,12 +779,21 @@ function bindControls() {
         const value = group.dataset.setting === "season"
           ? nextValue === "WINTER" ? 1 : 0
           : cropChoiceToPin(nextValue);
+        const previousSeason = systemState.season;
+        const previousCropProfile = systemState.cropProfile;
+        const previousCustomProfileSelected = systemState.customProfileSelected;
+        if (group.dataset.setting === "season") {
+          systemState.season = nextValue;
+          renderSystemState();
+        } else {
+          systemState.cropProfile = nextValue;
+          systemState.customProfileSelected = isCustomCrop;
+          renderSystemState();
+        }
         try {
           if (group.dataset.setting === "crop") {
             cropProfileCommandVersion += 1;
             cropProfileWriteInFlight = true;
-            systemState.customProfileSelected = nextValue === "CUSTOM";
-            renderSystemState();
           }
           if (isCustomCrop) console.log(`ABOUT TO WRITE: V7 = ${value}`);
           await setBlynkValue(pin, value);
@@ -776,6 +805,9 @@ function bindControls() {
           await refreshHardwareStatus();
           if (elements.commandMessage) elements.commandMessage.textContent = "Setting synchronized with ESP32.";
         } catch (error) {
+          systemState.season = previousSeason;
+          systemState.cropProfile = previousCropProfile;
+          systemState.customProfileSelected = previousCustomProfileSelected;
           if (group.dataset.setting === "crop") {
             cropProfileCommandVersion += 1;
             cropProfileWriteInFlight = false;
@@ -795,6 +827,7 @@ function bindControls() {
       const value = Number(customMoistureSlider.value);
       systemState.customMoisture = value;
       if (customMoistureValue) customMoistureValue.textContent = `${value}%`;
+      renderSystemState();
       console.log("CUSTOM MOISTURE UI UPDATED:", value);
     });
     customMoistureSlider.addEventListener("change", async () => {
