@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IoT-BASED SMART IRRIGATION AND MULTI-LAYER FARMING SYSTEM</title>
+    <title>Smart Irrigation &amp; Multi-Layer Farming</title>
     <style>
       :root {
         --bg: #040a0d;
@@ -2513,6 +2513,254 @@
         .exploded-pipe,
         .exploded-component { transition: none; transform: translate3d(-50%, 0, 0); }
       }
+
+      /* Frosted glass with a botanical, Y2K-inspired glow */
+      :root {
+        --bg: #07110f;
+        --bg-2: #0b1717;
+        --bg-3: #10201f;
+        --panel: rgba(19, 35, 34, 0.58);
+        --panel-strong: rgba(19, 35, 34, 0.76);
+        --panel-soft: rgba(19, 35, 34, 0.48);
+        --line: rgba(211, 236, 231, 0.14);
+        --line-strong: rgba(193, 232, 224, 0.28);
+        --text: #f2f7f6;
+        --muted: #a8bcba;
+        --green: #b8f0d1;
+        --green-2: #91dfc0;
+        --cyan: #a8e9ed;
+        --blue: #b6c8ff;
+        --amber: #ead6a6;
+        --danger: #e6a49a;
+        --glow: rgba(139, 228, 213, 0.16);
+        --shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+        --radius: 24px;
+      }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(ellipse at 78% 2%, rgba(91, 179, 168, 0.2), transparent 34%),
+          radial-gradient(ellipse at 8% 45%, rgba(112, 123, 197, 0.13), transparent 32%),
+          linear-gradient(145deg, #07110f 0%, #0c1918 52%, #091110 100%);
+      }
+
+      body::before {
+        background-image:
+          linear-gradient(rgba(193, 232, 224, 0.018) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(193, 232, 224, 0.018) 1px, transparent 1px);
+        background-size: 48px 48px;
+        opacity: 0.5;
+      }
+
+      body::after {
+        background:
+          radial-gradient(ellipse at 18% 34%, rgba(117, 147, 214, 0.12), transparent 34%),
+          radial-gradient(ellipse at 78% 28%, rgba(87, 199, 174, 0.14), transparent 36%);
+        filter: blur(64px);
+      }
+
+      .particles { opacity: 0.18; }
+
+      .section { padding: clamp(68px, 8vw, 104px) 0; }
+
+      h1,
+      h2 {
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+        font-weight: 650;
+        letter-spacing: -0.055em;
+        text-transform: none;
+      }
+
+      h1 {
+        font-size: clamp(2.8rem, 5.4vw, 5rem);
+        line-height: 0.99;
+        max-width: 780px;
+      }
+
+      h1 .accent {
+        color: transparent;
+        background: linear-gradient(100deg, #b8f0d1 8%, #a8e9ed 60%, #c6c5fa 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        text-shadow: none;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        letter-spacing: -0.045em;
+      }
+
+      .hero {
+        min-height: min(900px, 100vh);
+        padding: 48px 0 76px;
+      }
+
+      .hero::before {
+        background: rgba(94, 163, 155, 0.12);
+      }
+
+      .hero::after {
+        background: rgba(112, 123, 197, 0.1);
+      }
+
+      .project-credit,
+      .team-line,
+      .eyebrow {
+        letter-spacing: 0.16em;
+      }
+
+      .project-credit { color: #a8bcba; }
+      .team-line { color: #b9c9c7; }
+      .eyebrow { color: var(--green); }
+
+      .brand-tag,
+      .status-chip {
+        border-color: rgba(211, 236, 231, 0.18);
+        background: rgba(214, 237, 232, 0.07);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+      }
+
+      .button {
+        border-color: rgba(211, 236, 231, 0.18);
+        border-radius: 14px;
+        background: rgba(214, 237, 232, 0.075);
+        letter-spacing: 0.09em;
+        text-decoration: none;
+        backdrop-filter: blur(20px) saturate(155%);
+        -webkit-backdrop-filter: blur(20px) saturate(155%);
+      }
+
+      .button.primary {
+        color: #10201c;
+        background: linear-gradient(120deg, #c4f2d7, #a9e8e6 58%, #c7cafa);
+        border-color: rgba(235, 255, 249, 0.58);
+        box-shadow: 0 8px 28px rgba(125, 213, 195, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      }
+
+      .button.primary:hover {
+        box-shadow: 0 12px 32px rgba(125, 213, 195, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+      }
+
+      .dashboard-panel,
+      .futuristic-panel {
+        border-color: rgba(211, 236, 231, 0.2);
+        background:
+          linear-gradient(145deg, rgba(225, 247, 241, 0.105), transparent 40%),
+          linear-gradient(155deg, rgba(20, 41, 39, 0.74), rgba(9, 20, 21, 0.78));
+        box-shadow: 0 28px 72px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.13);
+        backdrop-filter: blur(28px) saturate(165%);
+        -webkit-backdrop-filter: blur(28px) saturate(165%);
+      }
+
+      .dashboard-panel::before {
+        background: radial-gradient(circle at 50% 0%, rgba(183, 240, 220, 0.12), transparent 55%);
+      }
+
+      .mini-card,
+      .farm-display,
+      .data-stream {
+        border-color: rgba(211, 236, 231, 0.14);
+        background-color: rgba(7, 17, 18, 0.38);
+      }
+
+      .section-header { margin-bottom: 34px; }
+
+      .section-note {
+        color: var(--muted);
+        letter-spacing: 0.015em;
+      }
+
+      .sensor-card,
+      .component-card,
+      .architecture-panel,
+      .software-item,
+      .step-card,
+      .feature-card,
+      .member-card,
+      .flow-step,
+      .about-box,
+      .why-box,
+      .farm-brief,
+      .footer-box {
+        border-color: rgba(211, 236, 231, 0.15);
+        background:
+          linear-gradient(145deg, rgba(225, 247, 241, 0.07), transparent 54%),
+          linear-gradient(155deg, rgba(23, 42, 40, 0.62), rgba(12, 25, 25, 0.68));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 16px 36px rgba(0, 0, 0, 0.17);
+        backdrop-filter: blur(22px) saturate(150%);
+        -webkit-backdrop-filter: blur(22px) saturate(150%);
+        border-radius: 22px;
+      }
+
+      .sensor-card:hover,
+      .component-card:hover,
+      .step-card:hover,
+      .feature-card:hover,
+      .member-card:hover {
+        border-color: rgba(193, 232, 224, 0.3);
+        box-shadow: 0 20px 42px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      }
+
+      .sensor-card h3,
+      .component-card p,
+      .about-box p,
+      .why-box p {
+        color: #b8c9c6;
+      }
+
+      .component-card h3,
+      .architecture-panel h3,
+      .software-item strong,
+      .step-card h4,
+      .feature-card h4,
+      .member-card h4 {
+        color: var(--text);
+      }
+
+      .component-card p strong,
+      .farm-brief strong {
+        color: var(--green);
+      }
+
+      .gauge .bg,
+      .circular-meter .bg {
+        stroke: rgba(193, 232, 224, 0.14);
+      }
+
+      .gauge .progress,
+      .circular-meter .progress {
+        filter: drop-shadow(0 0 8px rgba(168, 233, 237, 0.2));
+      }
+
+      .sensor-icon {
+        color: var(--green);
+        background: rgba(193, 232, 224, 0.08);
+        border-color: rgba(193, 232, 224, 0.18);
+        animation: none;
+      }
+
+      .footer-box { border-radius: 16px; }
+
+      :focus-visible {
+        outline: 2px solid var(--cyan);
+        outline-offset: 4px;
+      }
+
+      @media (max-width: 980px) {
+        .hero { min-height: auto; }
+        .hero-copy { padding-top: 42px; }
+      }
+
+      @media (max-width: 700px) {
+        h1 { font-size: clamp(2.45rem, 11vw, 4.2rem); }
+        .hero { padding-top: 20px; }
+        .hero-copy { padding-top: 28px; }
+      }
     </style>
   </head>
   <body>
@@ -2525,8 +2773,8 @@
             <p class="project-credit">PROJECT BY TEAM PROTOTYPE • IX-F</p>
             <div class="brand-tag"><span class="dot"></span> SYSTEM READY</div>
             <h1>
-              IoT-BASED SMART IRRIGATION<br />
-              <span class="accent">AND MULTI-LAYER FARMING SYSTEM</span>
+              IoT-Based Smart Irrigation<br />
+              <span class="accent">and Multi-Layer Farming System</span>
             </h1>
             <div class="team-line">TEAM PROTOTYPE • IX-F</div>
             <div class="hero-cta">
@@ -2565,9 +2813,9 @@
                     <svg viewBox="0 0 100 100" aria-hidden="true">
                       <defs>
                         <linearGradient id="meterGradient" x1="0%" x2="100%" y1="0%" y2="0%">
-                          <stop offset="0%" stop-color="#81f2be" />
-                          <stop offset="55%" stop-color="#66e3ff" />
-                          <stop offset="100%" stop-color="#7cb7ff" />
+                          <stop offset="0%" stop-color="#c1d89b" />
+                          <stop offset="55%" stop-color="#a9c7ad" />
+                          <stop offset="100%" stop-color="#839c68" />
                         </linearGradient>
                       </defs>
                       <circle class="bg" cx="50" cy="50" r="40"></circle>
@@ -2586,8 +2834,8 @@
                     <svg viewBox="0 0 100 100" aria-hidden="true">
                       <defs>
                         <linearGradient id="meterGradient2" x1="0%" x2="100%" y1="0%" y2="0%">
-                          <stop offset="0%" stop-color="#8df0ff" />
-                          <stop offset="100%" stop-color="#5fe4bf" />
+                          <stop offset="0%" stop-color="#c1d89b" />
+                          <stop offset="100%" stop-color="#9ebc7b" />
                         </linearGradient>
                       </defs>
                       <circle class="bg" cx="50" cy="50" r="40"></circle>
