@@ -1,4 +1,4 @@
-﻿const BLYNK_AUTH_TOKEN = "IMz1W97RnK2l9Y_cGsoBEzPGsKr1jQt-";
+﻿// Keep real credentials out of public client-side code.\nconst BLYNK_AUTH_TOKEN = "";
 const BLYNK_API_BASE = "https://blynk.cloud/external/api";
 const BLYNK_VIRTUAL_PINS = {
   pump: "V0",
