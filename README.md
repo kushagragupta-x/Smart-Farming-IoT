@@ -134,10 +134,8 @@ Do not commit Blynk authentication tokens, Wi-Fi passwords or other credentials 
 
 ## Credits
 
-**TEAM PROTOTYPE · IX-F**
-
-A collaborative school project involving hardware prototyping, software development, dashboard design and project presentation.
+Created by **Kushagra Gupta**.
 
 ---
 
-<p align="center"><sub>Smart Irrigation & Multi-Layer Farming System · Team Prototype IX-F</sub></p>
+<p align="center"><sub>Smart Irrigation & Multi-Layer Farming System</sub></p>
