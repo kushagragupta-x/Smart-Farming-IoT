@@ -1,4 +1,5 @@
-﻿// Keep real credentials out of public client-side code.\nconst BLYNK_AUTH_TOKEN = "";
+﻿// Keep real credentials out of public client-side code.
+const BLYNK_AUTH_TOKEN = "";
 const BLYNK_API_BASE = "https://blynk.cloud/external/api";
 const BLYNK_VIRTUAL_PINS = {
   pump: "V0",
